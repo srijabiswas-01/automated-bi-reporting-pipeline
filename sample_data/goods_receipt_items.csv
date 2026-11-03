@@ -1,0 +1,2 @@
+receipt_id,line_no,po_line_no,received_qty,accepted_qty,created_at,updated_at,version,is_active
+GR-001,1,1,10,10,2026-11-03T10:00:00Z,2026-11-03T10:00:00Z,1,true

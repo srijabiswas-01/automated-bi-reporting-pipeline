@@ -1,0 +1,2 @@
+store_id,product_id,quantity_on_hand,quantity_reserved,reorder_point,created_at,updated_at,version,is_active
+STR-001,PRD-001,9,0,3,2026-11-03T10:00:00Z,2026-11-03T10:00:00Z,1,true

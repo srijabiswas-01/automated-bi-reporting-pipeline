@@ -1,0 +1,8 @@
+<script>
+const transactionLines={
+purchase:[refField('product_id','products','product_id'),{name:'quantity',type:'number',step:'1',min:1,required:true},{name:'unit_cost',type:'number',min:0,required:true}],
+sale:[refField('product_id','products','product_id'),{name:'quantity',type:'number',step:'1',min:1,required:true},{name:'discount',type:'number',min:0,default:0},{name:'tax',type:'number',min:0,default:0}],
+receive:[{name:'po_line_no',label:'Purchase order line number',type:'number',step:'1',min:1,required:true},{name:'received_qty',type:'number',step:'1',min:1,required:true},{name:'accepted_qty',type:'number',step:'1',min:0,required:true}],
+returnOrder:[{name:'order_line_no',label:'Original sales line number',type:'number',step:'1',min:1,required:true},{name:'returned_qty',type:'number',step:'1',min:1,required:true},{name:'condition',options:['saleable','damaged'],required:true},{name:'restock',type:'checkbox'}]
+};
+</script>

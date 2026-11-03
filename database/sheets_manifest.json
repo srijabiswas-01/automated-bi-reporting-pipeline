@@ -1,0 +1,1440 @@
+{
+  "categories": [
+    {
+      "name": "category_id",
+      "type": "text",
+      "rules": "PRIMARY KEY"
+    },
+    {
+      "name": "category_name",
+      "type": "text",
+      "rules": "NOT NULL UNIQUE"
+    },
+    {
+      "name": "parent_category_id",
+      "type": "text",
+      "rules": "REFERENCES categories(category_id)"
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "rules": "NOT NULL DEFAULT 1 CHECK (version > 0)"
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "rules": "NOT NULL DEFAULT true"
+    }
+  ],
+  "brands": [
+    {
+      "name": "brand_id",
+      "type": "text",
+      "rules": "PRIMARY KEY"
+    },
+    {
+      "name": "brand_name",
+      "type": "text",
+      "rules": "NOT NULL UNIQUE"
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "rules": "NOT NULL DEFAULT 1 CHECK (version > 0)"
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "rules": "NOT NULL DEFAULT true"
+    }
+  ],
+  "segments": [
+    {
+      "name": "segment_id",
+      "type": "text",
+      "rules": "PRIMARY KEY"
+    },
+    {
+      "name": "segment_name",
+      "type": "text",
+      "rules": "NOT NULL UNIQUE"
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "rules": "NOT NULL DEFAULT 1 CHECK (version > 0)"
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "rules": "NOT NULL DEFAULT true"
+    }
+  ],
+  "roles": [
+    {
+      "name": "role_id",
+      "type": "text",
+      "rules": "PRIMARY KEY"
+    },
+    {
+      "name": "role_name",
+      "type": "text",
+      "rules": "NOT NULL UNIQUE"
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "rules": "NOT NULL DEFAULT 1 CHECK (version > 0)"
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "rules": "NOT NULL DEFAULT true"
+    }
+  ],
+  "stores": [
+    {
+      "name": "store_id",
+      "type": "text",
+      "rules": "PRIMARY KEY"
+    },
+    {
+      "name": "store_name",
+      "type": "text",
+      "rules": "NOT NULL"
+    },
+    {
+      "name": "city",
+      "type": "text",
+      "rules": "NOT NULL"
+    },
+    {
+      "name": "region",
+      "type": "text",
+      "rules": "NOT NULL"
+    },
+    {
+      "name": "status",
+      "type": "text",
+      "rules": "NOT NULL CHECK (status IN ('active','inactive'))"
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "rules": "NOT NULL DEFAULT 1 CHECK (version > 0)"
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "rules": "NOT NULL DEFAULT true"
+    }
+  ],
+  "users": [
+    {
+      "name": "user_id",
+      "type": "text",
+      "rules": "PRIMARY KEY"
+    },
+    {
+      "name": "email",
+      "type": "text",
+      "rules": "NOT NULL UNIQUE"
+    },
+    {
+      "name": "role_id",
+      "type": "text",
+      "rules": "NOT NULL REFERENCES roles(role_id)"
+    },
+    {
+      "name": "account_status",
+      "type": "text",
+      "rules": "NOT NULL CHECK (account_status IN ('active','inactive'))"
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "rules": "NOT NULL DEFAULT 1 CHECK (version > 0)"
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "rules": "NOT NULL DEFAULT true"
+    }
+  ],
+  "suppliers": [
+    {
+      "name": "supplier_id",
+      "type": "text",
+      "rules": "PRIMARY KEY"
+    },
+    {
+      "name": "supplier_name",
+      "type": "text",
+      "rules": "NOT NULL"
+    },
+    {
+      "name": "contact",
+      "type": "text",
+      "rules": ""
+    },
+    {
+      "name": "email",
+      "type": "text",
+      "rules": ""
+    },
+    {
+      "name": "lead_time_days",
+      "type": "integer",
+      "rules": "NOT NULL CHECK (lead_time_days >= 0)"
+    },
+    {
+      "name": "purchasing_terms",
+      "type": "text",
+      "rules": ""
+    },
+    {
+      "name": "status",
+      "type": "text",
+      "rules": "NOT NULL CHECK (status IN ('active','inactive'))"
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "rules": "NOT NULL DEFAULT 1 CHECK (version > 0)"
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "rules": "NOT NULL DEFAULT true"
+    }
+  ],
+  "products": [
+    {
+      "name": "product_id",
+      "type": "text",
+      "rules": "PRIMARY KEY"
+    },
+    {
+      "name": "sku",
+      "type": "text",
+      "rules": "NOT NULL UNIQUE"
+    },
+    {
+      "name": "product_name",
+      "type": "text",
+      "rules": "NOT NULL"
+    },
+    {
+      "name": "category_id",
+      "type": "text",
+      "rules": "NOT NULL REFERENCES categories(category_id)"
+    },
+    {
+      "name": "brand_id",
+      "type": "text",
+      "rules": "REFERENCES brands(brand_id)"
+    },
+    {
+      "name": "gtin",
+      "type": "text",
+      "rules": "UNIQUE"
+    },
+    {
+      "name": "unit",
+      "type": "text",
+      "rules": "NOT NULL"
+    },
+    {
+      "name": "cost_price",
+      "type": "numeric(14,2)",
+      "rules": "NOT NULL CHECK (cost_price >= 0)"
+    },
+    {
+      "name": "selling_price",
+      "type": "numeric(14,2)",
+      "rules": "NOT NULL CHECK (selling_price >= 0)"
+    },
+    {
+      "name": "tax_code",
+      "type": "text",
+      "rules": "NOT NULL"
+    },
+    {
+      "name": "status",
+      "type": "text",
+      "rules": "NOT NULL CHECK (status IN ('active','inactive'))"
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "rules": "NOT NULL DEFAULT 1 CHECK (version > 0)"
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "rules": "NOT NULL DEFAULT true"
+    }
+  ],
+  "product_price_history": [
+    {
+      "name": "price_id",
+      "type": "text",
+      "rules": "PRIMARY KEY"
+    },
+    {
+      "name": "product_id",
+      "type": "text",
+      "rules": "NOT NULL REFERENCES products(product_id)"
+    },
+    {
+      "name": "cost_price",
+      "type": "numeric(14,2)",
+      "rules": "NOT NULL CHECK (cost_price >= 0)"
+    },
+    {
+      "name": "selling_price",
+      "type": "numeric(14,2)",
+      "rules": "NOT NULL CHECK (selling_price >= 0)"
+    },
+    {
+      "name": "effective_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL"
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "rules": "NOT NULL DEFAULT 1 CHECK (version > 0)"
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "rules": "NOT NULL DEFAULT true"
+    }
+  ],
+  "customers": [
+    {
+      "name": "customer_id",
+      "type": "text",
+      "rules": "PRIMARY KEY"
+    },
+    {
+      "name": "customer_type",
+      "type": "text",
+      "rules": "NOT NULL CHECK (customer_type IN ('individual','business'))"
+    },
+    {
+      "name": "full_name",
+      "type": "text",
+      "rules": "NOT NULL"
+    },
+    {
+      "name": "email",
+      "type": "text",
+      "rules": ""
+    },
+    {
+      "name": "phone",
+      "type": "text",
+      "rules": ""
+    },
+    {
+      "name": "segment_id",
+      "type": "text",
+      "rules": "REFERENCES segments(segment_id)"
+    },
+    {
+      "name": "status",
+      "type": "text",
+      "rules": "NOT NULL CHECK (status IN ('active','inactive'))"
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "rules": "NOT NULL DEFAULT 1 CHECK (version > 0)"
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "rules": "NOT NULL DEFAULT true"
+    }
+  ],
+  "customer_addresses": [
+    {
+      "name": "address_id",
+      "type": "text",
+      "rules": "PRIMARY KEY"
+    },
+    {
+      "name": "customer_id",
+      "type": "text",
+      "rules": "NOT NULL REFERENCES customers(customer_id)"
+    },
+    {
+      "name": "city",
+      "type": "text",
+      "rules": "NOT NULL"
+    },
+    {
+      "name": "state",
+      "type": "text",
+      "rules": "NOT NULL"
+    },
+    {
+      "name": "postal_code",
+      "type": "text",
+      "rules": "NOT NULL"
+    },
+    {
+      "name": "country",
+      "type": "text",
+      "rules": "NOT NULL"
+    },
+    {
+      "name": "address_type",
+      "type": "text",
+      "rules": "NOT NULL CHECK (address_type IN ('billing','shipping'))"
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "rules": "NOT NULL DEFAULT 1 CHECK (version > 0)"
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "rules": "NOT NULL DEFAULT true"
+    }
+  ],
+  "product_suppliers": [
+    {
+      "name": "product_id",
+      "type": "text",
+      "rules": "NOT NULL REFERENCES products(product_id)"
+    },
+    {
+      "name": "supplier_id",
+      "type": "text",
+      "rules": "NOT NULL REFERENCES suppliers(supplier_id)"
+    },
+    {
+      "name": "supplier_sku",
+      "type": "text",
+      "rules": "NOT NULL"
+    },
+    {
+      "name": "supplier_cost",
+      "type": "numeric(14,2)",
+      "rules": "NOT NULL CHECK (supplier_cost >= 0)"
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "rules": "NOT NULL DEFAULT 1 CHECK (version > 0)"
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "rules": "NOT NULL DEFAULT true"
+    }
+  ],
+  "sales_orders": [
+    {
+      "name": "order_id",
+      "type": "text",
+      "rules": "PRIMARY KEY"
+    },
+    {
+      "name": "order_date",
+      "type": "timestamptz",
+      "rules": "NOT NULL"
+    },
+    {
+      "name": "customer_id",
+      "type": "text",
+      "rules": "NOT NULL REFERENCES customers(customer_id)"
+    },
+    {
+      "name": "store_id",
+      "type": "text",
+      "rules": "NOT NULL REFERENCES stores(store_id)"
+    },
+    {
+      "name": "channel",
+      "type": "text",
+      "rules": "NOT NULL CHECK (channel IN ('store','online'))"
+    },
+    {
+      "name": "order_status",
+      "type": "text",
+      "rules": "NOT NULL CHECK (order_status IN ('draft','confirmed','completed','cancelled'))"
+    },
+    {
+      "name": "fulfilment_status",
+      "type": "text",
+      "rules": "NOT NULL CHECK (fulfilment_status IN ('unfulfilled','partial','fulfilled'))"
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "rules": "NOT NULL DEFAULT 1 CHECK (version > 0)"
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "rules": "NOT NULL DEFAULT true"
+    }
+  ],
+  "sales_order_items": [
+    {
+      "name": "order_id",
+      "type": "text",
+      "rules": "NOT NULL REFERENCES sales_orders(order_id)"
+    },
+    {
+      "name": "line_no",
+      "type": "integer",
+      "rules": "NOT NULL CHECK (line_no > 0)"
+    },
+    {
+      "name": "product_id",
+      "type": "text",
+      "rules": "NOT NULL REFERENCES products(product_id)"
+    },
+    {
+      "name": "quantity",
+      "type": "integer",
+      "rules": "NOT NULL CHECK (quantity > 0)"
+    },
+    {
+      "name": "unit_price",
+      "type": "numeric(14,2)",
+      "rules": "NOT NULL CHECK (unit_price >= 0)"
+    },
+    {
+      "name": "discount",
+      "type": "numeric(14,2)",
+      "rules": "NOT NULL CHECK (discount >= 0 AND discount <= quantity * unit_price)"
+    },
+    {
+      "name": "tax",
+      "type": "numeric(14,2)",
+      "rules": "NOT NULL CHECK (tax >= 0)"
+    },
+    {
+      "name": "cost_snapshot",
+      "type": "numeric(14,2)",
+      "rules": "NOT NULL CHECK (cost_snapshot >= 0)"
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "rules": "NOT NULL DEFAULT 1 CHECK (version > 0)"
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "rules": "NOT NULL DEFAULT true"
+    }
+  ],
+  "purchase_orders": [
+    {
+      "name": "po_id",
+      "type": "text",
+      "rules": "PRIMARY KEY"
+    },
+    {
+      "name": "supplier_id",
+      "type": "text",
+      "rules": "NOT NULL REFERENCES suppliers(supplier_id)"
+    },
+    {
+      "name": "store_id",
+      "type": "text",
+      "rules": "NOT NULL REFERENCES stores(store_id)"
+    },
+    {
+      "name": "order_date",
+      "type": "date",
+      "rules": "NOT NULL"
+    },
+    {
+      "name": "expected_date",
+      "type": "date",
+      "rules": "CHECK (expected_date >= order_date)"
+    },
+    {
+      "name": "status",
+      "type": "text",
+      "rules": "NOT NULL CHECK (status IN ('draft','approved','partial','received','cancelled'))"
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "rules": "NOT NULL DEFAULT 1 CHECK (version > 0)"
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "rules": "NOT NULL DEFAULT true"
+    }
+  ],
+  "purchase_order_items": [
+    {
+      "name": "po_id",
+      "type": "text",
+      "rules": "NOT NULL REFERENCES purchase_orders(po_id)"
+    },
+    {
+      "name": "line_no",
+      "type": "integer",
+      "rules": "NOT NULL CHECK (line_no > 0)"
+    },
+    {
+      "name": "product_id",
+      "type": "text",
+      "rules": "NOT NULL REFERENCES products(product_id)"
+    },
+    {
+      "name": "ordered_qty",
+      "type": "integer",
+      "rules": "NOT NULL CHECK (ordered_qty > 0)"
+    },
+    {
+      "name": "unit_cost",
+      "type": "numeric(14,2)",
+      "rules": "NOT NULL CHECK (unit_cost >= 0)"
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "rules": "NOT NULL DEFAULT 1 CHECK (version > 0)"
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "rules": "NOT NULL DEFAULT true"
+    }
+  ],
+  "goods_receipts": [
+    {
+      "name": "receipt_id",
+      "type": "text",
+      "rules": "PRIMARY KEY"
+    },
+    {
+      "name": "po_id",
+      "type": "text",
+      "rules": "NOT NULL REFERENCES purchase_orders(po_id)"
+    },
+    {
+      "name": "received_date",
+      "type": "timestamptz",
+      "rules": "NOT NULL"
+    },
+    {
+      "name": "status",
+      "type": "text",
+      "rules": "NOT NULL CHECK (status IN ('draft','posted'))"
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "rules": "NOT NULL DEFAULT 1 CHECK (version > 0)"
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "rules": "NOT NULL DEFAULT true"
+    }
+  ],
+  "goods_receipt_items": [
+    {
+      "name": "receipt_id",
+      "type": "text",
+      "rules": "NOT NULL REFERENCES goods_receipts(receipt_id)"
+    },
+    {
+      "name": "line_no",
+      "type": "integer",
+      "rules": "NOT NULL CHECK (line_no > 0)"
+    },
+    {
+      "name": "po_line_no",
+      "type": "integer",
+      "rules": "NOT NULL CHECK (po_line_no > 0)"
+    },
+    {
+      "name": "received_qty",
+      "type": "integer",
+      "rules": "NOT NULL CHECK (received_qty > 0)"
+    },
+    {
+      "name": "accepted_qty",
+      "type": "integer",
+      "rules": "NOT NULL CHECK (accepted_qty >= 0 AND accepted_qty <= received_qty)"
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "rules": "NOT NULL DEFAULT 1 CHECK (version > 0)"
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "rules": "NOT NULL DEFAULT true"
+    }
+  ],
+  "inventory_balances": [
+    {
+      "name": "store_id",
+      "type": "text",
+      "rules": "NOT NULL REFERENCES stores(store_id)"
+    },
+    {
+      "name": "product_id",
+      "type": "text",
+      "rules": "NOT NULL REFERENCES products(product_id)"
+    },
+    {
+      "name": "quantity_on_hand",
+      "type": "integer",
+      "rules": "NOT NULL CHECK (quantity_on_hand >= 0)"
+    },
+    {
+      "name": "quantity_reserved",
+      "type": "integer",
+      "rules": "NOT NULL CHECK (quantity_reserved >= 0 AND quantity_reserved <= quantity_on_hand)"
+    },
+    {
+      "name": "reorder_point",
+      "type": "integer",
+      "rules": "NOT NULL CHECK (reorder_point >= 0)"
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "rules": "NOT NULL DEFAULT 1 CHECK (version > 0)"
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "rules": "NOT NULL DEFAULT true"
+    }
+  ],
+  "inventory_movements": [
+    {
+      "name": "movement_id",
+      "type": "text",
+      "rules": "PRIMARY KEY"
+    },
+    {
+      "name": "store_id",
+      "type": "text",
+      "rules": "NOT NULL REFERENCES stores(store_id)"
+    },
+    {
+      "name": "product_id",
+      "type": "text",
+      "rules": "NOT NULL REFERENCES products(product_id)"
+    },
+    {
+      "name": "movement_type",
+      "type": "text",
+      "rules": "NOT NULL CHECK (movement_type IN ('opening','receipt','sale','return','adjustment','transfer_in','transfer_out'))"
+    },
+    {
+      "name": "quantity_change",
+      "type": "integer",
+      "rules": "NOT NULL CHECK (quantity_change <> 0)"
+    },
+    {
+      "name": "reference_id",
+      "type": "text",
+      "rules": "NOT NULL"
+    },
+    {
+      "name": "occurred_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL"
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "rules": "NOT NULL DEFAULT 1 CHECK (version > 0)"
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "rules": "NOT NULL DEFAULT true"
+    }
+  ],
+  "payments": [
+    {
+      "name": "payment_id",
+      "type": "text",
+      "rules": "PRIMARY KEY"
+    },
+    {
+      "name": "order_id",
+      "type": "text",
+      "rules": "NOT NULL REFERENCES sales_orders(order_id)"
+    },
+    {
+      "name": "method",
+      "type": "text",
+      "rules": "NOT NULL CHECK (method IN ('cash','card','upi','bank'))"
+    },
+    {
+      "name": "amount",
+      "type": "numeric(14,2)",
+      "rules": "NOT NULL CHECK (amount > 0)"
+    },
+    {
+      "name": "status",
+      "type": "text",
+      "rules": "NOT NULL CHECK (status IN ('pending','settled','failed'))"
+    },
+    {
+      "name": "payment_date",
+      "type": "timestamptz",
+      "rules": "NOT NULL"
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "rules": "NOT NULL DEFAULT 1 CHECK (version > 0)"
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "rules": "NOT NULL DEFAULT true"
+    }
+  ],
+  "shipments": [
+    {
+      "name": "shipment_id",
+      "type": "text",
+      "rules": "PRIMARY KEY"
+    },
+    {
+      "name": "order_id",
+      "type": "text",
+      "rules": "NOT NULL REFERENCES sales_orders(order_id)"
+    },
+    {
+      "name": "carrier",
+      "type": "text",
+      "rules": ""
+    },
+    {
+      "name": "carrier_reference",
+      "type": "text",
+      "rules": ""
+    },
+    {
+      "name": "dispatched_at",
+      "type": "timestamptz",
+      "rules": ""
+    },
+    {
+      "name": "delivered_at",
+      "type": "timestamptz",
+      "rules": "CHECK (delivered_at >= dispatched_at)"
+    },
+    {
+      "name": "status",
+      "type": "text",
+      "rules": "NOT NULL CHECK (status IN ('pending','dispatched','delivered','cancelled'))"
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "rules": "NOT NULL DEFAULT 1 CHECK (version > 0)"
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "rules": "NOT NULL DEFAULT true"
+    }
+  ],
+  "returns": [
+    {
+      "name": "return_id",
+      "type": "text",
+      "rules": "PRIMARY KEY"
+    },
+    {
+      "name": "order_id",
+      "type": "text",
+      "rules": "NOT NULL REFERENCES sales_orders(order_id)"
+    },
+    {
+      "name": "return_date",
+      "type": "timestamptz",
+      "rules": "NOT NULL"
+    },
+    {
+      "name": "reason",
+      "type": "text",
+      "rules": "NOT NULL"
+    },
+    {
+      "name": "status",
+      "type": "text",
+      "rules": "NOT NULL CHECK (status IN ('requested','accepted','rejected'))"
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "rules": "NOT NULL DEFAULT 1 CHECK (version > 0)"
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "rules": "NOT NULL DEFAULT true"
+    }
+  ],
+  "return_items": [
+    {
+      "name": "return_id",
+      "type": "text",
+      "rules": "NOT NULL REFERENCES returns(return_id)"
+    },
+    {
+      "name": "line_no",
+      "type": "integer",
+      "rules": "NOT NULL CHECK (line_no > 0)"
+    },
+    {
+      "name": "order_line_no",
+      "type": "integer",
+      "rules": "NOT NULL CHECK (order_line_no > 0)"
+    },
+    {
+      "name": "returned_qty",
+      "type": "integer",
+      "rules": "NOT NULL CHECK (returned_qty > 0)"
+    },
+    {
+      "name": "condition",
+      "type": "text",
+      "rules": "NOT NULL CHECK (condition IN ('saleable','damaged'))"
+    },
+    {
+      "name": "restock",
+      "type": "boolean",
+      "rules": "NOT NULL"
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "rules": "NOT NULL DEFAULT 1 CHECK (version > 0)"
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "rules": "NOT NULL DEFAULT true"
+    }
+  ],
+  "refunds": [
+    {
+      "name": "refund_id",
+      "type": "text",
+      "rules": "PRIMARY KEY"
+    },
+    {
+      "name": "return_id",
+      "type": "text",
+      "rules": "NOT NULL REFERENCES returns(return_id)"
+    },
+    {
+      "name": "amount",
+      "type": "numeric(14,2)",
+      "rules": "NOT NULL CHECK (amount > 0)"
+    },
+    {
+      "name": "refund_status",
+      "type": "text",
+      "rules": "NOT NULL CHECK (refund_status IN ('pending','settled','failed'))"
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "rules": "NOT NULL DEFAULT 1 CHECK (version > 0)"
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "rules": "NOT NULL DEFAULT true"
+    }
+  ],
+  "audit_logs": [
+    {
+      "name": "audit_id",
+      "type": "text",
+      "rules": "PRIMARY KEY"
+    },
+    {
+      "name": "actor_id",
+      "type": "text",
+      "rules": "NOT NULL REFERENCES users(user_id)"
+    },
+    {
+      "name": "entity_table",
+      "type": "text",
+      "rules": "NOT NULL"
+    },
+    {
+      "name": "entity_id",
+      "type": "text",
+      "rules": "NOT NULL"
+    },
+    {
+      "name": "action",
+      "type": "text",
+      "rules": "NOT NULL CHECK (action IN ('create','update','deactivate','post'))"
+    },
+    {
+      "name": "before_data",
+      "type": "jsonb",
+      "rules": ""
+    },
+    {
+      "name": "after_data",
+      "type": "jsonb",
+      "rules": ""
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "rules": "NOT NULL DEFAULT 1 CHECK (version > 0)"
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "rules": "NOT NULL DEFAULT true"
+    }
+  ],
+  "pipeline_runs": [
+    {
+      "name": "run_id",
+      "type": "text",
+      "rules": "PRIMARY KEY"
+    },
+    {
+      "name": "period_key",
+      "type": "text",
+      "rules": "NOT NULL"
+    },
+    {
+      "name": "orchestrator",
+      "type": "text",
+      "rules": "NOT NULL CHECK (orchestrator IN ('github','airflow','manual'))"
+    },
+    {
+      "name": "status",
+      "type": "text",
+      "rules": "NOT NULL CHECK (status IN ('running','succeeded','failed'))"
+    },
+    {
+      "name": "started_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL"
+    },
+    {
+      "name": "heartbeat_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL"
+    },
+    {
+      "name": "finished_at",
+      "type": "timestamptz",
+      "rules": ""
+    },
+    {
+      "name": "rows_extracted",
+      "type": "integer",
+      "rules": "NOT NULL DEFAULT 0 CHECK (rows_extracted >= 0)"
+    },
+    {
+      "name": "rows_loaded",
+      "type": "integer",
+      "rules": "NOT NULL DEFAULT 0 CHECK (rows_loaded >= 0)"
+    },
+    {
+      "name": "error_message",
+      "type": "text",
+      "rules": ""
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "rules": "NOT NULL DEFAULT 1 CHECK (version > 0)"
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "rules": "NOT NULL DEFAULT true"
+    }
+  ],
+  "quality_errors": [
+    {
+      "name": "error_id",
+      "type": "text",
+      "rules": "PRIMARY KEY"
+    },
+    {
+      "name": "run_id",
+      "type": "text",
+      "rules": "NOT NULL REFERENCES pipeline_runs(run_id)"
+    },
+    {
+      "name": "source_table",
+      "type": "text",
+      "rules": "NOT NULL"
+    },
+    {
+      "name": "source_key",
+      "type": "text",
+      "rules": "NOT NULL"
+    },
+    {
+      "name": "rule",
+      "type": "text",
+      "rules": "NOT NULL"
+    },
+    {
+      "name": "message",
+      "type": "text",
+      "rules": "NOT NULL"
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "rules": "NOT NULL DEFAULT 1 CHECK (version > 0)"
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "rules": "NOT NULL DEFAULT true"
+    }
+  ],
+  "etl_watermarks": [
+    {
+      "name": "source_table",
+      "type": "text",
+      "rules": "PRIMARY KEY"
+    },
+    {
+      "name": "last_updated_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL"
+    },
+    {
+      "name": "last_source_key",
+      "type": "text",
+      "rules": "NOT NULL"
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz",
+      "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "rules": "NOT NULL DEFAULT 1 CHECK (version > 0)"
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "rules": "NOT NULL DEFAULT true"
+    }
+  ]
+}

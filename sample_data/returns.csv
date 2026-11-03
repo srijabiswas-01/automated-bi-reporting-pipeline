@@ -1,0 +1,2 @@
+return_id,order_id,return_date,reason,status,created_at,updated_at,version,is_active
+RET-001,SO-001,2026-11-03T09:00:00Z,Unneeded item,accepted,2026-11-03T10:00:00Z,2026-11-03T10:00:00Z,1,true

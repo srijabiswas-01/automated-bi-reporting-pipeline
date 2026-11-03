@@ -1,0 +1,2 @@
+supplier_id,supplier_name,contact,email,lead_time_days,purchasing_terms,status,created_at,updated_at,version,is_active
+SUP-001,Synthetic Wholesale,,,3,,active,2026-11-03T10:00:00Z,2026-11-03T10:00:00Z,1,true

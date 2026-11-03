@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: superstore
+      POSTGRES_USER: superstore
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./database/constraints.sql:/docker-entrypoint-initdb.d/02-constraints.sql:ro
+      - ./database/indexes.sql:/docker-entrypoint-initdb.d/03-indexes.sql:ro
+      - ./database/reporting_views.sql:/docker-entrypoint-initdb.d/04-reporting.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U superstore -d superstore"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+volumes:
+  postgres_data:

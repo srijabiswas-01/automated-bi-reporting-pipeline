@@ -1,0 +1,2 @@
+refund_id,return_id,amount,refund_status,created_at,updated_at,version,is_active
+REF-001,RET-001,318.6,settled,2026-11-03T10:00:00Z,2026-11-03T10:00:00Z,1,true

@@ -1,0 +1,2 @@
+return_id,line_no,order_line_no,returned_qty,condition,restock,created_at,updated_at,version,is_active
+RET-001,1,1,1,saleable,true,2026-11-03T10:00:00Z,2026-11-03T10:00:00Z,1,true

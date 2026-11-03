@@ -1,0 +1,51 @@
+name: Validate retail data architecture
+on: [push, pull_request, workflow_dispatch]
+jobs:
+  model-and-postgres:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: superstore
+          POSTGRES_PASSWORD: ci-test-only
+          POSTGRES_DB: superstore
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U superstore -d superstore"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: superstore
+      PGPASSWORD: ci-test-only
+      PGDATABASE: superstore
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: pip install -r requirements.txt
+      - name: Regenerate and check contracts
+        run: |
+          python tools/build_model.py
+          python tools/build_portal.py
+          python tools/build_sample_data.py
+          python -m unittest discover -s tests -v
+          git diff --exit-code -- database/schema.sql database/sheets_manifest.json docs/data_dictionary.md sample_data/sheets
+      - name: Apply schema and verify synthetic business scenario
+        run: |
+          psql -v ON_ERROR_STOP=1 -f database/schema.sql
+          psql -v ON_ERROR_STOP=1 -f database/constraints.sql
+          psql -v ON_ERROR_STOP=1 -f database/indexes.sql
+          psql -v ON_ERROR_STOP=1 -f database/reporting_views.sql
+          psql -v ON_ERROR_STOP=1 -f sample_data/seed.sql
+          psql -v ON_ERROR_STOP=1 -f tests/verify_database.sql
+      - name: Exercise versioned loading and failover against PostgreSQL
+        env:
+          DATABASE_URL: postgresql+psycopg://superstore:ci-test-only@localhost:5432/superstore
+          ETL_SOURCE: csv
+        run: python -m unittest discover -s tests -p test_postgres_integration.py -v

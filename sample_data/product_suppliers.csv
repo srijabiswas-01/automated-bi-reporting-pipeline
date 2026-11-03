@@ -1,0 +1,2 @@
+product_id,supplier_id,supplier_sku,supplier_cost,created_at,updated_at,version,is_active
+PRD-001,SUP-001,A4-500,200,2026-11-03T10:00:00Z,2026-11-03T10:00:00Z,1,true

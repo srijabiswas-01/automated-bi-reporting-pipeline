@@ -1,0 +1,2 @@
+po_id,line_no,product_id,ordered_qty,unit_cost,created_at,updated_at,version,is_active
+PO-001,1,PRD-001,10,200,2026-11-03T10:00:00Z,2026-11-03T10:00:00Z,1,true

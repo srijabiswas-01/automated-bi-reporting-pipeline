@@ -1,0 +1,2 @@
+customer_id,customer_type,full_name,email,phone,segment_id,status,created_at,updated_at,version,is_active
+CUS-001,individual,Demo Customer,customer@example.invalid,,SEG-001,active,2026-11-03T10:00:00Z,2026-11-03T10:00:00Z,1,true

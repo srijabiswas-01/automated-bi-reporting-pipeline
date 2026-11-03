@@ -1,0 +1,1 @@
+order_id,order_date,customer_id,store_id,channel,order_status,fulfilment_status,created_at,updated_at,version,is_active

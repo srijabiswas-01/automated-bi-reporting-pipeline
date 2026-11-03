@@ -1,0 +1,14 @@
+<script>
+function refField(name,table,key,label){return {name:name,table:table,key:key,label:label,required:true};}
+const transactionFields={
+purchase:[refField('supplier_id','suppliers','supplier_id'),refField('store_id','stores','store_id'),{name:'order_date',type:'date',default:new Date().toISOString().slice(0,10),required:true},{name:'expected_date',type:'date'}],
+receive:[refField('po_id','purchase_orders','po_id')],
+sale:[refField('customer_id','customers','customer_id'),refField('store_id','stores','store_id'),{name:'channel',options:['store','online'],required:true}],
+payment:[refField('order_id','sales_orders','order_id'),{name:'method',options:['cash','upi','card','bank'],required:true},{name:'amount',type:'number',min:'0.01',required:true}],
+returnOrder:[refField('order_id','sales_orders','order_id'),{name:'reason',required:true}],
+refund:[refField('return_id','returns','return_id'),{name:'amount',type:'number',min:'0.01',required:true}],
+ship:[refField('order_id','sales_orders','order_id'),{name:'carrier'},{name:'carrier_reference'},{name:'status',options:['dispatched','delivered'],required:true}],
+adjust:[refField('store_id','stores','store_id'),refField('product_id','products','product_id'),{name:'quantity',type:'number',step:'1',label:'Quantity change (+ / −)',required:true},{name:'reason',required:true},{name:'reorder_point',type:'number',step:'1',min:0}],
+transfer:[refField('store_id','stores','store_id'),refField('destination_store_id','stores','store_id'),refField('product_id','products','product_id'),{name:'quantity',type:'number',step:'1',min:1,required:true}]
+};
+</script>

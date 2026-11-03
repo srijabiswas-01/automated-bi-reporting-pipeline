@@ -1,0 +1,2 @@
+address_id,customer_id,city,state,postal_code,country,address_type,created_at,updated_at,version,is_active
+ADDR-001,CUS-001,Pune,Maharashtra,411001,IN,shipping,2026-11-03T10:00:00Z,2026-11-03T10:00:00Z,1,true

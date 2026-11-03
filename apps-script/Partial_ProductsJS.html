@@ -1,0 +1,28 @@
+<script>
+function renderMaster(page,table){
+  const host=page.querySelector('.form-host'),old=state.editing.table===table?state.editing.row:{};
+  host.replaceChildren();
+  const form=el('form'),grid=el('div',undefined,'form-grid');
+  (state.model[table] || []).filter(f=>!['created_at','updated_at','version'].includes(f.name) && !/PRIMARY KEY/.test(f.rules)).forEach(f=>{
+    const ref=f.rules.match(/REFERENCES (\w+)\((\w+)\)/),choices=f.rules.match(/IN \(([^)]+)\)/);
+    const def={name:f.name,required:/NOT NULL/.test(f.rules),type:f.type==='boolean'?'checkbox':/integer|numeric/.test(f.type)?'number':'text',step:f.type==='integer'?'1':'0.01'};
+    if(ref){def.table=ref[1];def.key=ref[2];}
+    if(choices)def.options=choices[1].split(',').map(s=>s.trim().replaceAll("'",''));
+    grid.append(field(def,old[f.name] ?? (f.name==='is_active'?true:undefined)));
+  });
+  form.append(grid);
+  const actions=el('div',undefined,'form-actions'),save=el('button',old.version?'Save changes':'Create record','primary'),reset=el('button','Clear');
+  save.type='submit';reset.type='button';reset.onclick=()=>{state.editing={};renderMaster(page,table);};
+  actions.append(save,reset);form.append(actions);
+  form.onsubmit=e=>{
+    e.preventDefault();const record={};new FormData(form).forEach((v,k)=>record[k]=v);
+    form.querySelectorAll('[type=checkbox]').forEach(n=>record[n.name]=n.checked);
+    const key=(state.model[table] || []).find(f=>/PRIMARY KEY/.test(f.rules));
+    if(key && old[key.name])record[key.name]=old[key.name];
+    const payload={table:table,record:record,version:old.version};
+    if(!key && old.version)payload.original_key={product_id:old.product_id,supplier_id:old.supplier_id};
+    submitOperation(form,'saveMaster',payload);
+  };
+  host.append(form);
+}
+</script>

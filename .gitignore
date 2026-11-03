@@ -1,0 +1,10 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+credentials*.json
+service-account*.json
+.clasp-credentials.json
+.clasprc.json
+.streamlit/secrets.toml
+airflow/logs/

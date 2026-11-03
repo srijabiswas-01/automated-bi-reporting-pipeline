@@ -1,0 +1,2 @@
+shipment_id,order_id,carrier,carrier_reference,dispatched_at,delivered_at,status,created_at,updated_at,version,is_active
+SHIP-001,SO-001,Store pickup,,2026-11-03T08:00:00Z,2026-11-03T08:00:00Z,delivered,2026-11-03T10:00:00Z,2026-11-03T10:00:00Z,1,true

@@ -1,0 +1,1 @@
+run_id,period_key,orchestrator,status,started_at,heartbeat_at,finished_at,rows_extracted,rows_loaded,error_message,created_at,updated_at,version,is_active

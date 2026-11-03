@@ -1,0 +1,2 @@
+audit_id,actor_id,entity_table,entity_id,action,before_data,after_data,created_at,updated_at,version,is_active
+AUD-001,USR-001,products,PRD-001,create,,"{""sku"":""PAPER-A4""}",2026-11-03T10:00:00Z,2026-11-03T10:00:00Z,1,true
