@@ -1,5 +1,7 @@
 # Deployment and operating guide
 
+**Selected fully automatic route:** follow [automatic_neon_github.md](automatic_neon_github.md) for Google Sheets → private GitHub → Neon. That route requires neither Google Cloud Console nor local Docker. The Docker, service-account and Excel sections below describe alternative modes.
+
 ## 1. Local demonstration
 
 Use Python 3.12 and Node.js 22 for the documented environment. Docker Desktop is needed for PostgreSQL. From the repository root:
@@ -68,7 +70,7 @@ The service account needs no portal user record because it reads through the She
 
 ## 5. GitHub Actions primary scheduler
 
-Push the repository to your own GitHub repository. Configure Actions secrets DATABASE_URL (TLS-enabled reachable PostgreSQL), GOOGLE_SERVICE_ACCOUNT_JSON, SPREADSHEET_ID and optionally ALERT_WEBHOOK_URL. primary_etl.yml runs at 02:00 UTC (07:30 IST), with three bounded attempts. Manual dispatch accepts a reporting date and force flag. Secrets are passed through environment variables; manual date input is passed as a quoted shell argument. The database is not the ephemeral CI PostgreSQL service.
+Push this project to your own private GitHub repository. Configure the Actions secret DATABASE_URL using a direct, TLS-enabled Neon connection and optionally ALERT_WEBHOOK_URL. Run initialize_neon.yml once on the empty database. Configure GitHubSync.gs to export operational/snapshot.json.gz from Apps Script. primary_etl.yml runs on snapshot pushes and hourly at minute 17, with three bounded attempts. Every run rechecks newer source versions using --force, so a second update in the same day is not skipped. Manual dispatch accepts a reporting date. Secrets are passed through environment variables; manual date input is passed as a quoted shell argument. The reporting database is separate from CI's ephemeral PostgreSQL service. See automatic_neon_github.md for the complete setup.
 
 ci_tests.yml uses a disposable PostgreSQL 16 service for schema, views, fixture, constraints, duplicate-load and advisory-lock checks. Do not run test_postgres_integration.py against operational data: it assumes the single synthetic fixture and manipulates test reporting periods. The regular suite skips it unless DATABASE_URL is explicitly exported.
 

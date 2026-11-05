@@ -21,6 +21,8 @@ The Sheets manifest is the machine-readable tab contract. initializeSuperstore c
 
 Cloud deployment requires the user's Google deployment, PostgreSQL hosting, GitHub secrets and an independently hosted Airflow service. No cloud resources or public URLs are provisioned automatically.
 
+The selected cloud route uses GitHubSync.gs to export a consistent gzip JSON snapshot to a private GitHub repository on an hourly Apps Script trigger. A snapshot push triggers primary_etl.yml to validate and upsert it into Neon using a direct PostgreSQL connection. An hourly Actions schedule retries the latest snapshot. This replaces service-account Sheets extraction for this route; Google Cloud Console and local Docker are unnecessary. See automatic_neon_github.md for setup, freshness limits and independent Airflow limitations.
+
 ## Operational consistency
 
 Every portal request acquires one script-wide lock. Mutations validate an in-memory snapshot, write a chunked PREPARED redo journal, update the operational tabs, advance a revision marker and clear the journal. Readers replay interrupted prepared changes before serving data. UUID request IDs are persisted as audit IDs to make client retries idempotent. The Sheets API extractor compares the revision and journal markers around its batch read to reject inconsistent snapshots. External spreadsheet edits bypass this protocol and are unsupported.

@@ -1,5 +1,12 @@
 name: Validate retail data architecture
-on: [push, pull_request, workflow_dispatch]
+on:
+  push:
+    paths-ignore:
+      - 'operational/**'
+  pull_request:
+    paths-ignore:
+      - 'operational/**'
+  workflow_dispatch:
 jobs:
   model-and-postgres:
     runs-on: ubuntu-latest

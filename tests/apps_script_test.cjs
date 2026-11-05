@@ -78,4 +78,46 @@ assert.strictEqual(context.loadSupermarket50().additional_sales,50);
 assert.strictEqual(snapshot().sales_orders.length,beforeBulk+50,'Bulk rerun duplicated sales');
 assert.strictEqual(context.loadAndTestDemo().status,'passed','Bulk loader changed existing test data');
 console.log('Bulk supermarket loader:',JSON.stringify(bulk));
+// Mock GitHub's REST API and Apps Script utilities to exercise the real exporter.
+const zlib=require('zlib');
+const properties={GITHUB_OWNER:'test-owner',GITHUB_REPO:'private-superstore',GITHUB_TOKEN:'test-token'};
+const propertyStore={getProperty:key=>properties[key] || null,setProperty:(key,value)=>{properties[key]=value;},setProperties:values=>Object.assign(properties,values),deleteProperty:key=>delete properties[key]};
+context.PropertiesService={getScriptProperties:()=>({...propertyStore,getProperty:key=>key==='SPREADSHEET_ID'?'test':propertyStore.getProperty(key)})};
+context.Session.getEffectiveUser=()=>({getEmail:()=>email || 'admin@example.invalid'});
+context.Utilities.DigestAlgorithm={SHA_256:'sha256'};context.Utilities.Charset={UTF_8:'utf8'};
+context.Utilities.computeDigest=(_,text)=>Array.from(crypto.createHash('sha256').update(text).digest());
+context.Utilities.newBlob=text=>({text});
+context.Utilities.gzip=blob=>({getBytes:()=>Array.from(zlib.gzipSync(blob.text))});
+context.Utilities.base64Encode=bytes=>Buffer.from(bytes).toString('base64');
+let remoteFile=null,privateRepo=true,uploads=0,uploadedSnapshot=null;
+context.UrlFetchApp={fetch:(url,options)=>{
+  assert.ok(url.startsWith('https://api.github.com/repos/test-owner/private-superstore'));
+  assert.strictEqual(options.followRedirects,false);
+  assert.strictEqual(options.headers.Authorization,'Bearer test-token');
+  let status=200,body;
+  if(!url.includes('/contents/'))body={private:privateRepo,default_branch:'main'};
+  else if(options.method==='get'){status=remoteFile?200:404;body=remoteFile || {};}
+  else{
+    const payload=JSON.parse(options.payload);
+    assert.strictEqual(payload.branch,'main');
+    if(remoteFile)assert.strictEqual(payload.sha,remoteFile.sha);
+    uploadedSnapshot=JSON.parse(zlib.gunzipSync(Buffer.from(payload.content,'base64')).toString());
+    uploads++;remoteFile={sha:'revision-'+uploads};body={content:remoteFile};
+  }
+  return {getResponseCode:()=>status,getContentText:()=>JSON.stringify(body)};
+}};
+assert.strictEqual(context.exportSuperstoreNow().status,'exported');
+assert.strictEqual(uploadedSnapshot.format_version,1);
+assert.strictEqual(Object.keys(uploadedSnapshot.tables).length,26);
+assert.strictEqual(uploadedSnapshot.tables.sales_orders.length,snapshot().sales_orders.length);
+assert.strictEqual(context.exportSuperstoreNow().status,'unchanged');
+assert.strictEqual(uploads,1,'Unchanged source was uploaded again');
+properties.SYNC_LAST_EXPORTED_AT='2000-01-01T00:00:00Z';
+assert.strictEqual(context.exportSuperstoreNow().status,'exported','Daily freshness heartbeat was not exported');
+privateRepo=false;assert.throws(()=>context.exportSuperstoreNow(),/PRIVATE/);privateRepo=true;
+email='unknown@example.invalid';assert.throws(()=>context.exportSuperstoreNow(),/not authorized/);email='admin@example.invalid';
+assert.throws(()=>context.scheduledSuperstoreExport_(),/owner mismatch/);
+properties.SYNC_TRIGGER_OWNER_EMAIL=email;
+email='';assert.strictEqual(context.scheduledSuperstoreExport_().status,'unchanged');email='admin@example.invalid';
+console.log('GitHub exporter: private destination, complete gzip snapshot, deduplication, freshness heartbeat, manual and scheduled authorization passed');
 if(process.env.EXPORT_BULK_SNAPSHOT==='1')console.log('BULK_SNAPSHOT '+JSON.stringify(snapshot()));

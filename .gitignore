@@ -8,3 +8,4 @@ service-account*.json
 .clasprc.json
 .streamlit/secrets.toml
 airflow/logs/
+sample_data/*.xlsx

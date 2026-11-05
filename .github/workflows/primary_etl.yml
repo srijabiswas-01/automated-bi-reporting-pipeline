@@ -1,17 +1,16 @@
-name: Primary daily retail ETL
+name: Automatic retail snapshot to Neon
 on:
+  push:
+    paths:
+      - 'operational/snapshot.json.gz'
   schedule:
-    - cron: '0 2 * * *'
+    - cron: '17 * * * *'
   workflow_dispatch:
     inputs:
       period:
         description: 'Reporting date YYYY-MM-DD (blank means current UTC date)'
         required: false
         type: string
-      force:
-        description: 'Recheck a successful period'
-        type: boolean
-        default: false
 permissions:
   contents: read
 concurrency:
@@ -23,12 +22,11 @@ jobs:
     timeout-minutes: 30
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
-      SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
       ALERT_WEBHOOK_URL: ${{ secrets.ALERT_WEBHOOK_URL }}
-      ETL_SOURCE: sheets
+      ETL_SOURCE: snapshot
+      SNAPSHOT_PATH: operational/snapshot.json.gz
+      SNAPSHOT_MAX_AGE_HOURS: '26'
       REQUESTED_PERIOD: ${{ inputs.period }}
-      FORCE_RUN: ${{ inputs.force }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -39,9 +37,8 @@ jobs:
       - name: Synchronize with bounded retries
         shell: bash
         run: |
-          args=(--orchestrator github)
+          args=(--orchestrator github --force)
           if [ -n "$REQUESTED_PERIOD" ]; then args+=(--period "$REQUESTED_PERIOD"); fi
-          if [ "$FORCE_RUN" = "true" ]; then args+=(--force); fi
           for attempt in 1 2 3; do
             if python -m etl.pipeline "${args[@]}"; then exit 0; fi
             if [ "$attempt" -lt 3 ]; then sleep 30; fi

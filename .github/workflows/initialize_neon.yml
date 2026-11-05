@@ -1,0 +1,22 @@
+name: Initialize empty Neon database
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: superstore-primary-etl
+  cancel-in-progress: false
+jobs:
+  initialize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - name: Initialize schema without importing sample records
+        run: python tools/init_database.py
