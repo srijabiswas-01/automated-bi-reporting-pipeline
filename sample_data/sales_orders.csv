@@ -1,2 +1,2 @@
-order_id,order_date,customer_id,store_id,channel,order_status,fulfilment_status,created_at,updated_at,version,is_active
-SO-001,2026-11-03T08:00:00Z,CUS-001,STR-001,store,completed,fulfilled,2026-11-03T10:00:00Z,2026-11-03T10:00:00Z,1,true
+order_id,order_date,customer_id,store_id,channel,order_status,fulfilment_status,order_code,created_at,updated_at,version,is_active
+SO-001,2026-11-03T08:00:00Z,CUS-001,STR-001,store,completed,fulfilled,,2026-11-03T10:00:00Z,2026-11-03T10:00:00Z,1,true

@@ -1,1 +1,1 @@
-movement_id,store_id,product_id,movement_type,quantity_change,reference_id,occurred_at,created_at,updated_at,version,is_active
+movement_id,store_id,product_id,movement_type,quantity_change,reference_id,occurred_at,movement_code,created_at,updated_at,version,is_active

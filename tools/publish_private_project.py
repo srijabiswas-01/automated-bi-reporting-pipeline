@@ -44,9 +44,9 @@ def main():
         'etl/__init__.py','etl/config.py','database/model.py','database/schema.sql',
         'database/constraints.sql','database/indexes.sql','database/reporting_views.sql')]
     if args.pipeline_only:
-        files=[ROOT/name for name in ('.github/workflows/primary_etl.yml','requirements.txt','database/model.py',
+        files=[ROOT/name for name in ('.github/workflows/primary_etl.yml','requirements.txt','database/model.py','database/schema.sql','database/sheets_manifest.json',
             'etl/__init__.py','etl/config.py','etl/extract.py','etl/transform.py','etl/validate.py',
-            'etl/load.py','etl/pipeline.py','etl/monitoring.py')]
+            'etl/load.py','etl/pipeline.py','etl/monitoring.py','etl/schema.py')]
     for name in (() if args.initialize_only or args.pipeline_only else FOLDERS):
         folder=ROOT/name
         if not folder.exists():

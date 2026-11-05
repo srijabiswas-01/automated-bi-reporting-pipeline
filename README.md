@@ -6,6 +6,8 @@ Retail operations and reporting application built from the supplied project blue
 
 The portal provides 19 dedicated pages with search, pagination, CSV exports, schema-driven master forms, purchasing, goods receipts, inventory adjustments/transfers, completed counter sales, payments, returns, refunds, shipping, user administration and audit records. Backend services enforce role permissions, preserve historical prices, reject overselling and deduplicate retried requests. A chunked redo journal recovers interrupted multi-tab writes.
 
+Readable references such as CUS-0001, PRD-0001 and SO-000001 are assigned to existing and new business records while UUID relationship keys remain unchanged. Portal tables and dropdowns display these codes and names; the automated ETL synchronizes them to Neon. See [display-code migration details](docs/display_codes.md).
+
 ## Run locally
 
 Use Python 3.12. Node.js 22 runs the Apps Script service tests. Start the dashboard immediately with the included synthetic data:

@@ -1,2 +1,2 @@
-role_id,role_name,created_at,updated_at,version,is_active
-ROLE-001,administrator,2026-11-03T10:00:00Z,2026-11-03T10:00:00Z,1,true
+role_id,role_name,role_code,created_at,updated_at,version,is_active
+ROLE-001,administrator,,2026-11-03T10:00:00Z,2026-11-03T10:00:00Z,1,true

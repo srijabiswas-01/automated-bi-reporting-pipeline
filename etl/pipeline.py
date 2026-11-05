@@ -9,8 +9,9 @@ from etl.config import Settings
 from etl.extract import extract
 from etl.transform import transform
 from etl.validate import validate
-from etl.load import load
+from etl.load import load, safe_database_error
 from etl.monitoring import notify_failure
+from etl.schema import ensure_display_code_schema
 
 
 def lock_key(period_key):
@@ -41,6 +42,7 @@ def run(settings, period, orchestrator='manual', force=False):
                 return {'status': 'skipped', 'reason': 'another worker owns the load'}
             try:
                 with conn.begin():
+                    ensure_display_code_schema(conn)
                     complete = conn.scalar(text("SELECT EXISTS(SELECT 1 FROM pipeline_runs WHERE period_key=:p AND status='succeeded')"), {'p': period_key})
                     if complete and not force:
                         return {'status': 'skipped', 'reason': 'period already completed'}
@@ -61,6 +63,8 @@ def run(settings, period, orchestrator='manual', force=False):
                                      {'id': run_id, 'e': sum(map(len, data.values())), 'l': count})
                     return {'status': 'succeeded', 'run_id': run_id, 'rows_loaded': count}
                 except Exception as exc:
+                    diagnostic=safe_database_error(exc)
+                    logging.getLogger('superstore.etl').error('Failure diagnostic: %s',diagnostic)
                     conn.rollback()
                     with conn.begin():
                         for error in errors:
@@ -68,10 +72,10 @@ def run(settings, period, orchestrator='manual', force=False):
                                 VALUES (:error_id,:run_id,:source_table,:source_key,:rule,:message)'''),
                                 dict(error, error_id=str(uuid.uuid4()), run_id=run_id))
                         conn.execute(text("UPDATE pipeline_runs SET status='failed',finished_at=now(),heartbeat_at=now(),error_message=:error WHERE run_id=:id"),
-                                     {'id': run_id, 'error': f'{type(exc).__name__}: load failed; inspect worker logs'})
+                                     {'id': run_id, 'error': diagnostic})
                     notify_failure(period_key, run_id)
                     # Do not leak a SQLAlchemy exception containing source values to public logs.
-                    raise RuntimeError(f'ETL failed; run {run_id}. Validation errors: {len(errors)}') from None
+                    raise RuntimeError(f'ETL failed; run {run_id}. Validation errors: {len(errors)}. {diagnostic}') from None
             finally:
                 conn.rollback()
                 conn.execute(text('SELECT pg_advisory_unlock(:key)'), {'key': key})

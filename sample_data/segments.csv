@@ -1,2 +1,2 @@
-segment_id,segment_name,created_at,updated_at,version,is_active
-SEG-001,Consumer,2026-11-03T10:00:00Z,2026-11-03T10:00:00Z,1,true
+segment_id,segment_name,segment_code,created_at,updated_at,version,is_active
+SEG-001,Consumer,,2026-11-03T10:00:00Z,2026-11-03T10:00:00Z,1,true

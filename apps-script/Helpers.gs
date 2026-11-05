@@ -19,13 +19,32 @@ function rows_(sheet) {
 }
 function snapshot_() {
   const book = book_(), data = {};
+  let legacy=false;
   Object.keys(MODEL).forEach(name => {
     const sheet = book.getSheetByName(name);
     if (!sheet) throw new Error('Initialize sheet: '+name);
     const headers = sheet.getRange(1,1,1,MODEL[name].length).getValues()[0];
-    if (headers.join('|') !== MODEL[name].map(c=>c.name).join('|')) throw new Error('Header mismatch: '+name);
+    const expected=MODEL[name].map(c=>c.name);
+    if (headers.join('|') !== expected.join('|')) {
+      const code=DISPLAY_CODES[name] && DISPLAY_CODES[name][0];
+      const old=expected.filter(c=>c!==code);
+      if (!code || headers.slice(0,old.length).join('|')!==old.join('|') || headers.slice(old.length).some(h=>h!=='')) throw new Error('Header mismatch: '+name);
+      legacy=true;
+    }
     data[name] = rows_(sheet);
   });
+  const changed=assignDisplayCodes_(data,true);
+  if (legacy || Object.keys(changed).length) {
+    validateSnapshot_(data);
+    const properties=PropertiesService.getScriptProperties();
+    if (Object.keys(changed).length && !properties.getProperty('DISPLAY_CODES_BACKUP_ID')) {
+      const backup=book.copy('Superstore backup before display codes '+now_());
+      properties.setProperty('DISPLAY_CODES_BACKUP_ID',backup.getId());
+    }
+    const administrator=data.users.find(u=>u.account_status==='active' && data.roles.some(r=>r.role_id===u.role_id && r.role_name==='administrator'));
+    if (administrator && Object.keys(changed).length) data.audit_logs.push(stamp_({audit_id:uuid_(),actor_id:administrator.user_id,entity_table:'display_codes',entity_id:'display_codes_v1',action:'update',before_data:'',after_data:JSON.stringify({assigned:changed,internal_ids:'unchanged'})}));
+    commit_(data);
+  }
   return data;
 }
 function cell_(value) {
@@ -48,6 +67,7 @@ function applySnapshot_(data) {
 // A durable redo journal makes interrupted multi-tab writes recoverable.
 // All portal readers take the same script lock and replay PREPARED snapshots first.
 function commit_(data) {
+  assignDisplayCodes_(data,false);
   const book = book_();
   const journal = book.getSheetByName('_journal') || book.insertSheet('_journal');
   journal.clearContents(); journal.getRange(1,1).setValue('BUILDING');

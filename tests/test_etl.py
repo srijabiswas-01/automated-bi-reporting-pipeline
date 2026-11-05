@@ -1,5 +1,6 @@
 import copy
 import unittest
+from datetime import date, datetime
 from decimal import Decimal
 from etl.config import ROOT
 from etl.extract import extract_csv
@@ -35,6 +36,12 @@ class ETLTests(unittest.TestCase):
         lines=sales_lines(frames)
         self.assertEqual(lines.net_sales.sum(),270)
         self.assertEqual(lines.gross_profit.sum(),70)
+
+    def test_sheets_dates_preserve_india_calendar_day(self):
+        self.assertEqual(convert('2026-08-31T18:30:00.000Z','date'),date(2026,9,1))
+        self.assertEqual(convert('2026-11-03T00:00:00.000Z','date'),date(2026,11,3))
+        self.assertEqual(convert('2026-11-03','date'),date(2026,11,3))
+        self.assertEqual(convert(datetime(2026,11,3),'date'),date(2026,11,3))
 
 
 if __name__=='__main__':

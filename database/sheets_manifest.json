@@ -16,6 +16,11 @@
       "rules": "REFERENCES categories(category_id)"
     },
     {
+      "name": "category_code",
+      "type": "text",
+      "rules": "UNIQUE"
+    },
+    {
       "name": "created_at",
       "type": "timestamptz",
       "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
@@ -46,6 +51,11 @@
       "name": "brand_name",
       "type": "text",
       "rules": "NOT NULL UNIQUE"
+    },
+    {
+      "name": "brand_code",
+      "type": "text",
+      "rules": "UNIQUE"
     },
     {
       "name": "created_at",
@@ -80,6 +90,11 @@
       "rules": "NOT NULL UNIQUE"
     },
     {
+      "name": "segment_code",
+      "type": "text",
+      "rules": "UNIQUE"
+    },
+    {
       "name": "created_at",
       "type": "timestamptz",
       "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
@@ -110,6 +125,11 @@
       "name": "role_name",
       "type": "text",
       "rules": "NOT NULL UNIQUE"
+    },
+    {
+      "name": "role_code",
+      "type": "text",
+      "rules": "UNIQUE"
     },
     {
       "name": "created_at",
@@ -159,6 +179,11 @@
       "rules": "NOT NULL CHECK (status IN ('active','inactive'))"
     },
     {
+      "name": "store_code",
+      "type": "text",
+      "rules": "UNIQUE"
+    },
+    {
       "name": "created_at",
       "type": "timestamptz",
       "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
@@ -199,6 +224,11 @@
       "name": "account_status",
       "type": "text",
       "rules": "NOT NULL CHECK (account_status IN ('active','inactive'))"
+    },
+    {
+      "name": "user_code",
+      "type": "text",
+      "rules": "UNIQUE"
     },
     {
       "name": "created_at",
@@ -256,6 +286,11 @@
       "name": "status",
       "type": "text",
       "rules": "NOT NULL CHECK (status IN ('active','inactive'))"
+    },
+    {
+      "name": "supplier_code",
+      "type": "text",
+      "rules": "UNIQUE"
     },
     {
       "name": "created_at",
@@ -335,6 +370,11 @@
       "rules": "NOT NULL CHECK (status IN ('active','inactive'))"
     },
     {
+      "name": "product_code",
+      "type": "text",
+      "rules": "UNIQUE"
+    },
+    {
       "name": "created_at",
       "type": "timestamptz",
       "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
@@ -380,6 +420,11 @@
       "name": "effective_at",
       "type": "timestamptz",
       "rules": "NOT NULL"
+    },
+    {
+      "name": "price_code",
+      "type": "text",
+      "rules": "UNIQUE"
     },
     {
       "name": "created_at",
@@ -439,6 +484,11 @@
       "rules": "NOT NULL CHECK (status IN ('active','inactive'))"
     },
     {
+      "name": "customer_code",
+      "type": "text",
+      "rules": "UNIQUE"
+    },
+    {
       "name": "created_at",
       "type": "timestamptz",
       "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
@@ -494,6 +544,11 @@
       "name": "address_type",
       "type": "text",
       "rules": "NOT NULL CHECK (address_type IN ('billing','shipping'))"
+    },
+    {
+      "name": "address_code",
+      "type": "text",
+      "rules": "UNIQUE"
     },
     {
       "name": "created_at",
@@ -593,6 +648,11 @@
       "name": "fulfilment_status",
       "type": "text",
       "rules": "NOT NULL CHECK (fulfilment_status IN ('unfulfilled','partial','fulfilled'))"
+    },
+    {
+      "name": "order_code",
+      "type": "text",
+      "rules": "UNIQUE"
     },
     {
       "name": "created_at",
@@ -709,6 +769,11 @@
       "rules": "NOT NULL CHECK (status IN ('draft','approved','partial','received','cancelled'))"
     },
     {
+      "name": "po_code",
+      "type": "text",
+      "rules": "UNIQUE"
+    },
+    {
       "name": "created_at",
       "type": "timestamptz",
       "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
@@ -796,6 +861,11 @@
       "name": "status",
       "type": "text",
       "rules": "NOT NULL CHECK (status IN ('draft','posted'))"
+    },
+    {
+      "name": "receipt_code",
+      "type": "text",
+      "rules": "UNIQUE"
     },
     {
       "name": "created_at",
@@ -949,6 +1019,11 @@
       "rules": "NOT NULL"
     },
     {
+      "name": "movement_code",
+      "type": "text",
+      "rules": "UNIQUE"
+    },
+    {
       "name": "created_at",
       "type": "timestamptz",
       "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
@@ -999,6 +1074,11 @@
       "name": "payment_date",
       "type": "timestamptz",
       "rules": "NOT NULL"
+    },
+    {
+      "name": "payment_code",
+      "type": "text",
+      "rules": "UNIQUE"
     },
     {
       "name": "created_at",
@@ -1058,6 +1138,11 @@
       "rules": "NOT NULL CHECK (status IN ('pending','dispatched','delivered','cancelled'))"
     },
     {
+      "name": "shipment_code",
+      "type": "text",
+      "rules": "UNIQUE"
+    },
+    {
       "name": "created_at",
       "type": "timestamptz",
       "rules": "NOT NULL DEFAULT CURRENT_TIMESTAMP"
@@ -1103,6 +1188,11 @@
       "name": "status",
       "type": "text",
       "rules": "NOT NULL CHECK (status IN ('requested','accepted','rejected'))"
+    },
+    {
+      "name": "return_code",
+      "type": "text",
+      "rules": "UNIQUE"
     },
     {
       "name": "created_at",
@@ -1197,6 +1287,11 @@
       "name": "refund_status",
       "type": "text",
       "rules": "NOT NULL CHECK (refund_status IN ('pending','settled','failed'))"
+    },
+    {
+      "name": "refund_code",
+      "type": "text",
+      "rules": "UNIQUE"
     },
     {
       "name": "created_at",

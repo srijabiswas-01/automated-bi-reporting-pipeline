@@ -22,7 +22,7 @@ Do not upload .env, downloaded Excel workbooks, Google keys or authentication fi
 
 1. Create a project at https://neon.com and open **Connect**.
 2. Turn **connection pooling off** and copy the direct PostgreSQL connection string, preserving its TLS parameters.
-3. In GitHub, open the private repository's **Settings → Secrets and variables → Actions → New repository secret**.
+3. In GitHub, open the   private repository's **Settings → Secrets and variables → Actions → New repository secret**.
 4. Name the secret `DATABASE_URL` and paste the connection string as its value. Do not paste it into source code, workflow YAML or chat.
 5. In the repository's **Actions** tab, select **Initialize empty Neon database → Run workflow**. It creates the tables, constraints, indexes and views without sample records.
 6. Wait for the green success status before installing the export trigger.

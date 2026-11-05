@@ -1,4 +1,5 @@
 from datetime import date, datetime, timezone
+from zoneinfo import ZoneInfo
 from decimal import Decimal, InvalidOperation
 import json
 
@@ -27,7 +28,20 @@ def convert(value, kind):
             return False
         raise ValueError('Expected true or false')
     if kind == 'date':
-        return date.fromisoformat(str(value))
+        if isinstance(value, datetime):
+            return value.astimezone(ZoneInfo('Asia/Kolkata')).date() if value.tzinfo else value.date()
+        if isinstance(value, date):
+            return value
+        text=str(value)
+        try:
+            return date.fromisoformat(text)
+        except ValueError:
+            # Sheets Date cells are serialized to UTC by Apps Script; midnight
+            # in the spreadsheet's India timezone is the preceding UTC date.
+            timestamp=datetime.fromisoformat(text.replace('Z','+00:00'))
+            if timestamp.tzinfo is None:
+                raise ValueError('Timestamp used for a date must include a timezone')
+            return timestamp.astimezone(ZoneInfo('Asia/Kolkata')).date()
     if kind == 'timestamptz':
         timestamp = datetime.fromisoformat(str(value).replace('Z', '+00:00'))
         if timestamp.tzinfo is None:

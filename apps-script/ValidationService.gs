@@ -32,6 +32,7 @@ function validateSnapshot_(data) {
 function normalizeMaster_(table, input) {
   const row={};
   MODEL[table].forEach(f=> {
+    if (DISPLAY_CODES[table] && f.name===DISPLAY_CODES[table][0]) return;
     if (!Object.prototype.hasOwnProperty.call(input,f.name)) return;
     let value=input[f.name];
     if (typeof value==='string') value=value.trim();

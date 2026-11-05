@@ -1,4 +1,4 @@
-movement_id,store_id,product_id,movement_type,quantity_change,reference_id,occurred_at,created_at,updated_at,version,is_active
-MOV-001,STR-001,PRD-001,receipt,10,GR-001,2026-11-02T08:00:00Z,2026-11-03T10:00:00Z,2026-11-03T10:00:00Z,1,true
-MOV-002,STR-001,PRD-001,sale,-2,SO-001,2026-11-03T08:00:00Z,2026-11-03T10:00:00Z,2026-11-03T10:00:00Z,1,true
-MOV-003,STR-001,PRD-001,return,1,RET-001,2026-11-03T09:00:00Z,2026-11-03T10:00:00Z,2026-11-03T10:00:00Z,1,true
+movement_id,store_id,product_id,movement_type,quantity_change,reference_id,occurred_at,movement_code,created_at,updated_at,version,is_active
+MOV-001,STR-001,PRD-001,receipt,10,GR-001,2026-11-02T08:00:00Z,,2026-11-03T10:00:00Z,2026-11-03T10:00:00Z,1,true
+MOV-002,STR-001,PRD-001,sale,-2,SO-001,2026-11-03T08:00:00Z,,2026-11-03T10:00:00Z,2026-11-03T10:00:00Z,1,true
+MOV-003,STR-001,PRD-001,return,1,RET-001,2026-11-03T09:00:00Z,,2026-11-03T10:00:00Z,2026-11-03T10:00:00Z,1,true

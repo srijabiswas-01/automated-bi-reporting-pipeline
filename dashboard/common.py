@@ -5,12 +5,20 @@ from pathlib import Path
 import pandas as pd
 import plotly.express as px
 import streamlit as st
+from dotenv import dotenv_values
 from sqlalchemy import create_engine, text
 
 ROOT = Path(__file__).resolve().parents[1]
 REPORT_TABLES = ('products', 'categories', 'customers', 'segments', 'stores', 'sales_orders',
                  'sales_order_items', 'returns', 'return_items', 'inventory_balances',
                  'inventory_movements', 'shipments', 'pipeline_runs', 'quality_errors')
+
+
+def demo_mode():
+    # Read the file before deciding the source. Settings.from_env is only called
+    # on the database path, so it cannot initialize this decision for us.
+    configured=dotenv_values(ROOT / '.env').get('DASHBOARD_DEMO') or 'true'
+    return os.getenv('DASHBOARD_DEMO',configured).strip().lower()=='true'
 
 
 @st.cache_data(ttl=60)
@@ -61,7 +69,11 @@ def sales_lines(data):
 
 
 def context():
-    demo = os.getenv('DASHBOARD_DEMO', 'true').lower() == 'true'
+    demo = demo_mode()
+    source_key='demo' if demo else 'database'
+    if st.session_state.get('_reporting_source')!=source_key:
+        st.session_state.pop('sales_period',None)
+        st.session_state['_reporting_source']=source_key
     st.sidebar.caption('Synthetic CSV demo' if demo else 'PostgreSQL reporting data')
     if demo:
         st.info('Synthetic demonstration records. Switch DASHBOARD_DEMO=false to read PostgreSQL.')
@@ -105,7 +117,9 @@ def bar(frame, x, y, title):
     if frame.empty:
         st.caption('No records match these filters.')
     else:
-        st.plotly_chart(px.bar(frame, x=x, y=y, title=title, color_discrete_sequence=['#087f70']), width='stretch')
+        figure=px.bar(frame, x=x, y=y, title=title, color_discrete_sequence=['#087f70'])
+        figure.update_xaxes(type='category')
+        st.plotly_chart(figure, width='stretch')
 
 
 def download(frame, filename):

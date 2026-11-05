@@ -1,2 +1,2 @@
-price_id,product_id,cost_price,selling_price,effective_at,created_at,updated_at,version,is_active
-PRICE-001,PRD-001,200,300,2026-11-01T00:00:00Z,2026-11-03T10:00:00Z,2026-11-03T10:00:00Z,1,true
+price_id,product_id,cost_price,selling_price,effective_at,price_code,created_at,updated_at,version,is_active
+PRICE-001,PRD-001,200,300,2026-11-01T00:00:00Z,,2026-11-03T10:00:00Z,2026-11-03T10:00:00Z,1,true

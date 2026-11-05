@@ -14,5 +14,5 @@ function bootstrap_(data,actor) {
     if (['users','audit_logs'].includes(table) && actor.role!=='administrator') return;
     visible[table]=data[table];
   });
-  return {actor:actor,data:visible,model:MODEL,kpis:dashboard_(data),refreshed_at:now_()};
+  return {actor:actor,data:visible,model:MODEL,display_codes:DISPLAY_CODES,kpis:dashboard_(data),refreshed_at:now_()};
 }

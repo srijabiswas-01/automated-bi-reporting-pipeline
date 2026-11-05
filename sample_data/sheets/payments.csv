@@ -1,1 +1,1 @@
-payment_id,order_id,method,amount,status,payment_date,created_at,updated_at,version,is_active
+payment_id,order_id,method,amount,status,payment_date,payment_code,created_at,updated_at,version,is_active

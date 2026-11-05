@@ -1,2 +1,2 @@
-po_id,supplier_id,store_id,order_date,expected_date,status,created_at,updated_at,version,is_active
-PO-001,SUP-001,STR-001,2026-11-01,2026-11-02,received,2026-11-03T10:00:00Z,2026-11-03T10:00:00Z,1,true
+po_id,supplier_id,store_id,order_date,expected_date,status,po_code,created_at,updated_at,version,is_active
+PO-001,SUP-001,STR-001,2026-11-01,2026-11-02,received,,2026-11-03T10:00:00Z,2026-11-03T10:00:00Z,1,true

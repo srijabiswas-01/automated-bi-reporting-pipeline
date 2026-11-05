@@ -1,1 +1,1 @@
-customer_id,customer_type,full_name,email,phone,segment_id,status,created_at,updated_at,version,is_active
+customer_id,customer_type,full_name,email,phone,segment_id,status,customer_code,created_at,updated_at,version,is_active

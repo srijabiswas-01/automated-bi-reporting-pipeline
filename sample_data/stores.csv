@@ -1,2 +1,2 @@
-store_id,store_name,city,region,status,created_at,updated_at,version,is_active
-STR-001,Demo Central,Pune,West,active,2026-11-03T10:00:00Z,2026-11-03T10:00:00Z,1,true
+store_id,store_name,city,region,status,store_code,created_at,updated_at,version,is_active
+STR-001,Demo Central,Pune,West,active,,2026-11-03T10:00:00Z,2026-11-03T10:00:00Z,1,true

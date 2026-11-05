@@ -1,1 +1,1 @@
-return_id,order_id,return_date,reason,status,created_at,updated_at,version,is_active
+return_id,order_id,return_date,reason,status,return_code,created_at,updated_at,version,is_active

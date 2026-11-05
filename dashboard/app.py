@@ -7,7 +7,7 @@ from dashboard.common import context, kpis, bar, download
 from dashboard.pages import sales, customers, products, inventory, pipeline_monitor
 
 st.set_page_config(page_title='Superstore Intelligence', page_icon='📊', layout='wide')
-st.markdown('<style>.stApp{background:#f5f8fa}div[data-testid="stMetric"]{background:white;padding:20px;border:1px solid #dde6eb;border-radius:10px}</style>', unsafe_allow_html=True)
+st.markdown('<style>div[data-testid="stMetric"]{padding:20px;border-radius:10px}</style>', unsafe_allow_html=True)
 
 
 def overview():

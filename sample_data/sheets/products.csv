@@ -1,1 +1,1 @@
-product_id,sku,product_name,category_id,brand_id,gtin,unit,cost_price,selling_price,tax_code,status,created_at,updated_at,version,is_active
+product_id,sku,product_name,category_id,brand_id,gtin,unit,cost_price,selling_price,tax_code,status,product_code,created_at,updated_at,version,is_active

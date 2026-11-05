@@ -17,11 +17,13 @@ class Sheet {
   };}
 }
 const sheets={};
-const book={getSheetByName:n=>sheets[n] || null,insertSheet:n=>sheets[n]=new Sheet(n)};
+let backupCount=0;
+const book={getSheetByName:n=>sheets[n] || null,insertSheet:n=>sheets[n]=new Sheet(n),copy:()=>{backupCount++;return {getId:()=>'synthetic-backup-id'};}};
+const initialProperties={};
 const context=vm.createContext({console,Date,Math,JSON,Number,String,Object,Array,Set,Error,
   Utilities:{getUuid:()=>crypto.randomUUID()},
   Session:{getActiveUser:()=>({getEmail:()=>email})},
-  PropertiesService:{getScriptProperties:()=>({getProperty:key=>key==='SPREADSHEET_ID'?'test':email})},
+  PropertiesService:{getScriptProperties:()=>({getProperty:key=>key==='SPREADSHEET_ID'?'test':key==='BOOTSTRAP_ADMIN_EMAIL'?email:initialProperties[key] || null,setProperty:(key,value)=>initialProperties[key]=value})},
   LockService:{getScriptLock:()=>({waitLock(){},releaseLock(){}})},
   SpreadsheetApp:{openById:()=>book,flush(){}}
 });
@@ -33,7 +35,26 @@ for(const table of Object.keys(model)){
 }
 function request(action,payload){return context.api(action,{...payload,request_id:payload?.request_id || crypto.randomUUID()});}
 function snapshot(){return context.snapshot_();}
+const codeSpecs=vm.runInContext('DISPLAY_CODES',context);
+// Simulate the deployed workbook before display columns existed.
+for(const [table,spec] of Object.entries(codeSpecs)){
+  const index=sheets[table].values[0].indexOf(spec[0]);
+  for(const row of sheets[table].values)row.splice(index,1);
+}
 assert.strictEqual(request('bootstrap').kpis.net_sales,270);
+assert.strictEqual(snapshot().customers[0].customer_id,'CUS-001','Migration replaced an internal customer key');
+assert.strictEqual(snapshot().customers[0].customer_code,'CUS-0001');
+assert.strictEqual(snapshot().products[0].product_id,'PRD-001','Migration replaced an internal product key');
+assert.strictEqual(snapshot().products[0].product_code,'PRD-0001');
+const migratedVersion=snapshot().customers[0].version;
+assert.strictEqual(migratedVersion,Number(source.customers[0].version)+1);
+assert.strictEqual(snapshot().customers[0].version,migratedVersion,'Rereading repeatedly changed the version');
+assert.strictEqual(backupCount,1,'Migration did not create exactly one workbook backup');
+const createdCustomer=request('saveMaster',{table:'customers',record:{customer_type:'individual',full_name:'Synthetic extra customer',status:'active',customer_code:'CUS-9999'}}).result;
+assert.strictEqual(createdCustomer.code,'CUS-0002','Client supplied a code or the sequence duplicated one');
+const extra=snapshot().customers.find(r=>r.customer_id===createdCustomer.id);
+request('saveMaster',{table:'customers',record:{...extra,full_name:'Synthetic edited customer',customer_code:'CUS-9999'},version:extra.version});
+assert.strictEqual(snapshot().customers.find(r=>r.customer_id===createdCustomer.id).customer_code,'CUS-0002','An edit replaced the permanent code');
 const product=snapshot().products[0];
 assert.throws(()=>request('saveMaster',{table:'products',record:{...product,product_id:'',sku:'PAPER-A4'}}),/Duplicate/);
 request('saveMaster',{table:'products',record:{...product,selling_price:350},version:product.version});
@@ -120,4 +141,14 @@ assert.throws(()=>context.scheduledSuperstoreExport_(),/owner mismatch/);
 properties.SYNC_TRIGGER_OWNER_EMAIL=email;
 email='';assert.strictEqual(context.scheduledSuperstoreExport_().status,'unchanged');email='admin@example.invalid';
 console.log('GitHub exporter: private destination, complete gzip snapshot, deduplication, freshness heartbeat, manual and scheduled authorization passed');
+const browserScript=fs.readFileSync('apps-script/Partial_CoreJS.html','utf8').match(/<script>([\s\S]*)<\/script>/)[1];
+vm.runInContext(browserScript,context,{filename:'Partial_CoreJS.html'});
+context.__clientBootstrap=context.bootstrap_(snapshot(),{role:'administrator'});
+vm.runInContext('Object.assign(state,__clientBootstrap)',context);
+assert.strictEqual(vm.runInContext("visibleColumns('customers')[0]",context),'customer_code');
+assert.strictEqual(vm.runInContext("visibleColumns('customers').includes('customer_id')",context),false);
+assert.ok(vm.runInContext("labelFor('customers',state.data.customers[0].customer_id)",context).startsWith('CUS-0001'));
+assert.ok(vm.runInContext("displayCell('customers','segment_id',state.data.customers[0])",context).startsWith('SEG-'));
+assert.ok(vm.runInContext("labelFor('sales_orders',state.data.sales_orders[0].order_id)",context).startsWith('SO-'));
+console.log('Display codes: legacy header migration, immutable UUIDs/codes, version updates, new record counters and readable portal references passed');
 if(process.env.EXPORT_BULK_SNAPSHOT==='1')console.log('BULK_SNAPSHOT '+JSON.stringify(snapshot()));

@@ -51,10 +51,12 @@ function api(action, payload) {
     const prior = data.audit_logs.find(r=>r.audit_id===payload.request_id);
     if (prior) {
       if (prior.actor_id!==actor.user_id || prior.entity_table!==action) throw new Error('Request ID already used');
-      return {message:'Already saved',result:{id:prior.entity_id}};
+      return {message:'Already saved',result:{id:prior.entity_id,code:displayCodeForId_(data,prior.entity_id)}};
     }
     const before = JSON.stringify(data);
     const result = handlers[action](data, payload, actor);
+    assignDisplayCodes_(data,false);
+    result.code=displayCodeForId_(data,result.id);
     validateSnapshot_(data);
     audit_(data, actor, action, result, before, payload.request_id);
     commit_(data);

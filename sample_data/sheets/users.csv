@@ -1,1 +1,1 @@
-user_id,email,role_id,account_status,created_at,updated_at,version,is_active
+user_id,email,role_id,account_status,user_code,created_at,updated_at,version,is_active

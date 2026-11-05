@@ -13,6 +13,7 @@ Primary key: `category_id`.
 | category_id | text | PRIMARY KEY |
 | category_name | text | NOT NULL UNIQUE |
 | parent_category_id | text | REFERENCES categories(category_id) |
+| category_code | text | UNIQUE |
 | created_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | updated_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | version | integer | NOT NULL DEFAULT 1 CHECK (version > 0) |
@@ -26,6 +27,7 @@ Primary key: `brand_id`.
 | --- | --- | --- |
 | brand_id | text | PRIMARY KEY |
 | brand_name | text | NOT NULL UNIQUE |
+| brand_code | text | UNIQUE |
 | created_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | updated_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | version | integer | NOT NULL DEFAULT 1 CHECK (version > 0) |
@@ -39,6 +41,7 @@ Primary key: `segment_id`.
 | --- | --- | --- |
 | segment_id | text | PRIMARY KEY |
 | segment_name | text | NOT NULL UNIQUE |
+| segment_code | text | UNIQUE |
 | created_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | updated_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | version | integer | NOT NULL DEFAULT 1 CHECK (version > 0) |
@@ -52,6 +55,7 @@ Primary key: `role_id`.
 | --- | --- | --- |
 | role_id | text | PRIMARY KEY |
 | role_name | text | NOT NULL UNIQUE |
+| role_code | text | UNIQUE |
 | created_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | updated_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | version | integer | NOT NULL DEFAULT 1 CHECK (version > 0) |
@@ -68,6 +72,7 @@ Primary key: `store_id`.
 | city | text | NOT NULL |
 | region | text | NOT NULL |
 | status | text | NOT NULL CHECK (status IN ('active','inactive')) |
+| store_code | text | UNIQUE |
 | created_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | updated_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | version | integer | NOT NULL DEFAULT 1 CHECK (version > 0) |
@@ -83,6 +88,7 @@ Primary key: `user_id`.
 | email | text | NOT NULL UNIQUE |
 | role_id | text | NOT NULL REFERENCES roles(role_id) |
 | account_status | text | NOT NULL CHECK (account_status IN ('active','inactive')) |
+| user_code | text | UNIQUE |
 | created_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | updated_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | version | integer | NOT NULL DEFAULT 1 CHECK (version > 0) |
@@ -101,6 +107,7 @@ Primary key: `supplier_id`.
 | lead_time_days | integer | NOT NULL CHECK (lead_time_days >= 0) |
 | purchasing_terms | text | Optional |
 | status | text | NOT NULL CHECK (status IN ('active','inactive')) |
+| supplier_code | text | UNIQUE |
 | created_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | updated_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | version | integer | NOT NULL DEFAULT 1 CHECK (version > 0) |
@@ -123,6 +130,7 @@ Primary key: `product_id`.
 | selling_price | numeric(14,2) | NOT NULL CHECK (selling_price >= 0) |
 | tax_code | text | NOT NULL |
 | status | text | NOT NULL CHECK (status IN ('active','inactive')) |
+| product_code | text | UNIQUE |
 | created_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | updated_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | version | integer | NOT NULL DEFAULT 1 CHECK (version > 0) |
@@ -139,6 +147,7 @@ Primary key: `price_id`.
 | cost_price | numeric(14,2) | NOT NULL CHECK (cost_price >= 0) |
 | selling_price | numeric(14,2) | NOT NULL CHECK (selling_price >= 0) |
 | effective_at | timestamptz | NOT NULL |
+| price_code | text | UNIQUE |
 | created_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | updated_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | version | integer | NOT NULL DEFAULT 1 CHECK (version > 0) |
@@ -157,6 +166,7 @@ Primary key: `customer_id`.
 | phone | text | Optional |
 | segment_id | text | REFERENCES segments(segment_id) |
 | status | text | NOT NULL CHECK (status IN ('active','inactive')) |
+| customer_code | text | UNIQUE |
 | created_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | updated_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | version | integer | NOT NULL DEFAULT 1 CHECK (version > 0) |
@@ -175,6 +185,7 @@ Primary key: `address_id`.
 | postal_code | text | NOT NULL |
 | country | text | NOT NULL |
 | address_type | text | NOT NULL CHECK (address_type IN ('billing','shipping')) |
+| address_code | text | UNIQUE |
 | created_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | updated_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | version | integer | NOT NULL DEFAULT 1 CHECK (version > 0) |
@@ -208,6 +219,7 @@ Primary key: `order_id`.
 | channel | text | NOT NULL CHECK (channel IN ('store','online')) |
 | order_status | text | NOT NULL CHECK (order_status IN ('draft','confirmed','completed','cancelled')) |
 | fulfilment_status | text | NOT NULL CHECK (fulfilment_status IN ('unfulfilled','partial','fulfilled')) |
+| order_code | text | UNIQUE |
 | created_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | updated_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | version | integer | NOT NULL DEFAULT 1 CHECK (version > 0) |
@@ -244,6 +256,7 @@ Primary key: `po_id`.
 | order_date | date | NOT NULL |
 | expected_date | date | CHECK (expected_date >= order_date) |
 | status | text | NOT NULL CHECK (status IN ('draft','approved','partial','received','cancelled')) |
+| po_code | text | UNIQUE |
 | created_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | updated_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | version | integer | NOT NULL DEFAULT 1 CHECK (version > 0) |
@@ -275,6 +288,7 @@ Primary key: `receipt_id`.
 | po_id | text | NOT NULL REFERENCES purchase_orders(po_id) |
 | received_date | timestamptz | NOT NULL |
 | status | text | NOT NULL CHECK (status IN ('draft','posted')) |
+| receipt_code | text | UNIQUE |
 | created_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | updated_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | version | integer | NOT NULL DEFAULT 1 CHECK (version > 0) |
@@ -325,6 +339,7 @@ Primary key: `movement_id`.
 | quantity_change | integer | NOT NULL CHECK (quantity_change <> 0) |
 | reference_id | text | NOT NULL |
 | occurred_at | timestamptz | NOT NULL |
+| movement_code | text | UNIQUE |
 | created_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | updated_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | version | integer | NOT NULL DEFAULT 1 CHECK (version > 0) |
@@ -342,6 +357,7 @@ Primary key: `payment_id`.
 | amount | numeric(14,2) | NOT NULL CHECK (amount > 0) |
 | status | text | NOT NULL CHECK (status IN ('pending','settled','failed')) |
 | payment_date | timestamptz | NOT NULL |
+| payment_code | text | UNIQUE |
 | created_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | updated_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | version | integer | NOT NULL DEFAULT 1 CHECK (version > 0) |
@@ -360,6 +376,7 @@ Primary key: `shipment_id`.
 | dispatched_at | timestamptz | Optional |
 | delivered_at | timestamptz | CHECK (delivered_at >= dispatched_at) |
 | status | text | NOT NULL CHECK (status IN ('pending','dispatched','delivered','cancelled')) |
+| shipment_code | text | UNIQUE |
 | created_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | updated_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | version | integer | NOT NULL DEFAULT 1 CHECK (version > 0) |
@@ -376,6 +393,7 @@ Primary key: `return_id`.
 | return_date | timestamptz | NOT NULL |
 | reason | text | NOT NULL |
 | status | text | NOT NULL CHECK (status IN ('requested','accepted','rejected')) |
+| return_code | text | UNIQUE |
 | created_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | updated_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | version | integer | NOT NULL DEFAULT 1 CHECK (version > 0) |
@@ -408,6 +426,7 @@ Primary key: `refund_id`.
 | return_id | text | NOT NULL REFERENCES returns(return_id) |
 | amount | numeric(14,2) | NOT NULL CHECK (amount > 0) |
 | refund_status | text | NOT NULL CHECK (refund_status IN ('pending','settled','failed')) |
+| refund_code | text | UNIQUE |
 | created_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | updated_at | timestamptz | NOT NULL DEFAULT CURRENT_TIMESTAMP |
 | version | integer | NOT NULL DEFAULT 1 CHECK (version > 0) |

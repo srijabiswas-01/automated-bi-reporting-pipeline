@@ -1,1 +1,1 @@
-address_id,customer_id,city,state,postal_code,country,address_type,created_at,updated_at,version,is_active
+address_id,customer_id,city,state,postal_code,country,address_type,address_code,created_at,updated_at,version,is_active

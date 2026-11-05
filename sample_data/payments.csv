@@ -1,2 +1,2 @@
-payment_id,order_id,method,amount,status,payment_date,created_at,updated_at,version,is_active
-PAY-001,SO-001,upi,637.2,settled,2026-11-03T08:00:00Z,2026-11-03T10:00:00Z,2026-11-03T10:00:00Z,1,true
+payment_id,order_id,method,amount,status,payment_date,payment_code,created_at,updated_at,version,is_active
+PAY-001,SO-001,upi,637.2,settled,2026-11-03T08:00:00Z,,2026-11-03T10:00:00Z,2026-11-03T10:00:00Z,1,true

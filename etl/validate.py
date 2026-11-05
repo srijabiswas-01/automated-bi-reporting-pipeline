@@ -1,6 +1,6 @@
 """Validate the complete snapshot before any reporting tables change."""
 import re
-from database.model import TABLES, METADATA, COMPOSITE_KEYS
+from database.model import TABLES, METADATA, COMPOSITE_KEYS, DISPLAY_CODES
 
 
 def primary_key(table):
@@ -19,6 +19,11 @@ def validate(data):
         seen = set()
         unique = {}
         for index, row in enumerate(rows, 2):
+            if table in DISPLAY_CODES:
+                field,prefix,width=DISPLAY_CODES[table]
+                code=row.get(field)
+                if code and not re.fullmatch(re.escape(prefix)+r'-\d{'+str(width)+r',}',str(code)):
+                    error(table,index,'display_code',f'Invalid {field} format')
             key = tuple(row.get(k) for k in primary_key(table))
             if key in seen:
                 error(table, index, 'primary_key', 'Duplicate key')

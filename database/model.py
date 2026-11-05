@@ -32,3 +32,19 @@ TABLES = {
 }
 COMPOSITE_KEYS = {'product_suppliers': 'product_id, supplier_id', 'sales_order_items': 'order_id, line_no', 'purchase_order_items': 'po_id, line_no', 'goods_receipt_items': 'receipt_id, line_no', 'inventory_balances': 'store_id, product_id', 'return_items': 'return_id, line_no'}
 METADATA = [('created_at','timestamptz','NOT NULL DEFAULT CURRENT_TIMESTAMP'),('updated_at','timestamptz','NOT NULL DEFAULT CURRENT_TIMESTAMP'),('version','integer','NOT NULL DEFAULT 1 CHECK (version > 0)'),('is_active','boolean','NOT NULL DEFAULT true')]
+
+# UUIDs remain the relationship keys. Codes are permanent, unique operator labels.
+DISPLAY_CODES = {
+    'categories': ('category_code','CAT',4), 'brands': ('brand_code','BRD',4),
+    'segments': ('segment_code','SEG',4), 'roles': ('role_code','ROL',4),
+    'stores': ('store_code','STR',4), 'users': ('user_code','USR',4),
+    'suppliers': ('supplier_code','SUP',4), 'products': ('product_code','PRD',4),
+    'customers': ('customer_code','CUS',4), 'customer_addresses': ('address_code','ADR',4),
+    'product_price_history': ('price_code','PCH',6), 'sales_orders': ('order_code','SO',6),
+    'purchase_orders': ('po_code','PO',6), 'goods_receipts': ('receipt_code','GR',6),
+    'inventory_movements': ('movement_code','MOV',6), 'payments': ('payment_code','PAY',6),
+    'shipments': ('shipment_code','SHP',6), 'returns': ('return_code','RET',6),
+    'refunds': ('refund_code','REF',6),
+}
+for _table, (_field, _prefix, _width) in DISPLAY_CODES.items():
+    TABLES[_table].append((_field,'text','UNIQUE'))

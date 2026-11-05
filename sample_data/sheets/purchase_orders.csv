@@ -1,1 +1,1 @@
-po_id,supplier_id,store_id,order_date,expected_date,status,created_at,updated_at,version,is_active
+po_id,supplier_id,store_id,order_date,expected_date,status,po_code,created_at,updated_at,version,is_active

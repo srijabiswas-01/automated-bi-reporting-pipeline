@@ -3,7 +3,9 @@ function renderMaster(page,table){
   const host=page.querySelector('.form-host'),old=state.editing.table===table?state.editing.row:{};
   host.replaceChildren();
   const form=el('form'),grid=el('div',undefined,'form-grid');
-  (state.model[table] || []).filter(f=>!['created_at','updated_at','version'].includes(f.name) && !/PRIMARY KEY/.test(f.rules)).forEach(f=>{
+  const codeSpec=(state.display_codes || {})[table];
+  if(codeSpec && old[codeSpec[0]])host.append(el('p','Reference: '+old[codeSpec[0]]));
+  (state.model[table] || []).filter(f=>!['created_at','updated_at','version'].includes(f.name) && !/PRIMARY KEY/.test(f.rules) && !(codeSpec && f.name===codeSpec[0])).forEach(f=>{
     const ref=f.rules.match(/REFERENCES (\w+)\((\w+)\)/),choices=f.rules.match(/IN \(([^)]+)\)/);
     const def={name:f.name,required:/NOT NULL/.test(f.rules),type:f.type==='boolean'?'checkbox':/integer|numeric/.test(f.type)?'number':'text',step:f.type==='integer'?'1':'0.01'};
     if(ref){def.table=ref[1];def.key=ref[2];}

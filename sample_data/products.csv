@@ -1,2 +1,2 @@
-product_id,sku,product_name,category_id,brand_id,gtin,unit,cost_price,selling_price,tax_code,status,created_at,updated_at,version,is_active
-PRD-001,PAPER-A4,A4 Paper Ream,CAT-001,BR-001,,ream,200,300,GST18,active,2026-11-03T10:00:00Z,2026-11-03T10:00:00Z,1,true
+product_id,sku,product_name,category_id,brand_id,gtin,unit,cost_price,selling_price,tax_code,status,product_code,created_at,updated_at,version,is_active
+PRD-001,PAPER-A4,A4 Paper Ream,CAT-001,BR-001,,ream,200,300,GST18,active,,2026-11-03T10:00:00Z,2026-11-03T10:00:00Z,1,true
