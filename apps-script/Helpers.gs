@@ -11,9 +11,12 @@ function stamp_(row, old) {
 function rows_(sheet) {
   const values = sheet.getDataRange().getValues();
   const headers = values.shift();
+  const dateFields=new Set((MODEL[sheet.getName()] || []).filter(f=>f.type==='date').map(f=>f.name));
   return values.filter(row => row.some(v => v !== '')).map(row => {
     const record = {};
-    headers.forEach((h,i) => record[h] = row[i] instanceof Date ? row[i].toISOString() : row[i]);
+    headers.forEach((h,i) => {
+      record[h] = row[i] instanceof Date ? (dateFields.has(h) ? Utilities.formatDate(row[i],'Asia/Kolkata','yyyy-MM-dd') : row[i].toISOString()) : row[i];
+    });
     return record;
   });
 }

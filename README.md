@@ -1,6 +1,6 @@
 # Intelligent Superstore Management & Automated BI Reporting System
 
-Retail operations and reporting application built from the supplied project blueprint. Includes the requested Apps Script pages and services, PostgreSQL model, shared ETL, primary GitHub workflow, independent Airflow recovery DAG and six-page Streamlit dashboard.
+Retail operations and reporting application built from the supplied project blueprint. Includes the requested Apps Script pages and services, PostgreSQL model, shared ETL, primary GitHub workflow and six-page Streamlit dashboard.
 
 **Fully automatic cloud route:** [Google Sheets → private GitHub → Neon setup](docs/automatic_neon_github.md). Apps Script exports hourly; GitHub Actions loads Neon. No Google Cloud Console, service account, Excel downloads or local Docker is required for this route. Create the private repository and Neon project, initialize the database using its GitHub workflow, then configure and run installAutomaticSync in Apps Script.
 
@@ -35,13 +35,12 @@ The sample sells two paper reams at INR 300 each with INR 60 total discount, the
 ## Files
 
 - [Data dictionary](docs/data_dictionary.md): all columns, types, keys and field rules.
-- [Business rules](docs/business_rules.md): stock, order, return, KPI and failover contracts.
+- [Business rules](docs/business_rules.md): stock, order, return, KPI and retry contracts.
 - [Architecture](docs/architecture.md): system boundaries and implementation status.
-- [Deployment guide](docs/deployment.md): Apps Script, clasp, Google credentials, PostgreSQL, Actions, Airflow and Streamlit hosting.
+- [Deployment guide](docs/deployment.md): Apps Script, clasp, Google credentials, PostgreSQL, Actions and Streamlit hosting.
 - `apps-script/`: the complete portal shell, 19 pages, shared UI partials and backend services.
 - `etl/`: source extraction, typed conversion, validation, versioned loading, locking, logging and optional failure webhook.
 - `dashboard/`: six Streamlit reporting pages with Plotly charts, filters and CSV downloads.
-- `airflow/`: independent recovery DAG and its deployment image.
 - `.github/workflows/`: daily primary ETL and CI against disposable PostgreSQL.
 - `database/model.py`: canonical model; regenerate derived schema, dictionary and templates after editing.
 - `database/constraints.sql`: cross-record receipt and return validation.
@@ -57,12 +56,12 @@ python tools/build_sample_data.py
 python -m unittest discover -s tests -v
 ```
 
-Service tests use an in-memory Apps Script adapter to check duplicates, historical prices, overselling, returns, partial receipts, identity checks, retry deduplication and interrupted-write recovery. Dashboard tests render all six pages. PostgreSQL integration tests run in CI and skip locally unless DATABASE_URL is exported for a disposable initialized database.
+Service tests use an in-memory Apps Script adapter to check duplicates, historical prices, overselling, returns, partial receipts, identity checks, retry deduplication and interrupted-write recovery. Dashboard tests render all six pages. PostgreSQL integration tests run in CI and skip locally unless TEST_DATABASE_URL is exported for a disposable initialized database. Never point TEST_DATABASE_URL at business tables. Run `python -m tools.test_isolated_postgres` to create a temporary test schema, exercise the full Apps Script-to-ETL workflow, and remove that schema afterward. Run `python -m tools.check_database_integrity` for a read-only audit of the configured live database.
 
 ## Connect and deploy
 
 **Cannot use Google Cloud Console?** Use the [Excel snapshot import](docs/import_without_cloud_console.md). Download the complete operational Sheet as `sample_data/superstore.xlsx`, set ETL_SOURCE=xlsx, and run `python -m etl.pipeline --force`. This imports a downloaded snapshot; later Sheet changes require a fresh download.
 
-Configure the Apps Script project and initialize its tabs before deploying the portal. For the selected cloud route, follow [automatic Neon/GitHub setup](docs/automatic_neon_github.md): GitHubSync exports hourly to a private repository, snapshot pushes trigger ETL, and an hourly Actions schedule retries the latest snapshot. No Google service account is required for that route. Airflow remains an optional independently hosted recovery service and uses the same PostgreSQL advisory lock; it is not provisioned automatically.
+Configure the Apps Script project and initialize its tabs before deploying the portal. For the selected cloud route, follow [automatic Neon/GitHub setup](docs/automatic_neon_github.md): GitHubSync exports hourly to a private repository, snapshot pushes trigger ETL, and an hourly Actions schedule retries the latest snapshot. No Google service account is required for that route.
 
 Code and local demo data are included; cloud accounts, credentials, live deployment and real-user authorization checks require your environment. Inventory turnover/lot ageing, draft-order reservations and approval/cancellation workflows are extensions beyond the implemented counter-sale workflow. The Sheets journal rewrites snapshots and is intended for portfolio-scale datasets. Payment/refund entries record staff-confirmed settlements; no payment gateway is connected.

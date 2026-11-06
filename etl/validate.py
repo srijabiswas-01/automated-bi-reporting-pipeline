@@ -11,6 +11,16 @@ def primary_key(table):
 
 def validate(data):
     errors = []
+    # Index each referenced column once rather than scanning the parent table for
+    # every child row. Keep the complete-snapshot validation policy unchanged.
+    references = {}
+    for fields in TABLES.values():
+        for _, _, rule in fields:
+            ref = re.search(r'REFERENCES (\w+)\((\w+)\)', rule)
+            if ref:
+                target = (ref[1], ref[2])
+                if target not in references:
+                    references[target] = {r.get(ref[2]) for r in data.get(ref[1], [])}
 
     def error(table, index, rule, message):
         errors.append(dict(source_table=table, source_key=str(index), rule=rule, message=message))
@@ -39,7 +49,7 @@ def validate(data):
                         error(table, index, 'unique', f'Duplicate {name}')
                     unique[name, value] = True
                 ref = re.search(r'REFERENCES (\w+)\((\w+)\)', rule)
-                if ref and not any(r.get(ref[2]) == value for r in data.get(ref[1], [])):
+                if ref and value not in references[(ref[1], ref[2])]:
                     error(table, index, 'foreign_key', f'Unknown {name}')
                 # CHECK expressions originate only in the trusted canonical model.
                 if 'CHECK (' in rule:
@@ -91,4 +101,39 @@ def validate(data):
     for key in set(balances) | set(movements):
         if balances.get(key, {}).get('quantity_on_hand') != movements.get(key, 0):
             error('inventory_balances', key, 'ledger_reconciliation', 'On-hand quantity differs from movement ledger')
+    totals, paid, refund_limits, refunded, order_refunds = {}, {}, {}, {}, {}
+    for row in data.get('sales_order_items', []):
+        if row.get('is_active'):
+            order = row.get('order_id')
+            totals[order] = totals.get(order, 0) + row['quantity'] * row['unit_price'] - row['discount'] + row['tax']
+    for row in data.get('payments', []):
+        if row.get('is_active') and row.get('status') == 'settled':
+            order = row.get('order_id')
+            paid[order] = paid.get(order, 0) + row['amount']
+    for order, amount in paid.items():
+        if amount > totals.get(order, 0) or orders.get((order,), {}).get('order_status') != 'completed':
+            error('payments', order, 'payment_limit', 'Settled payments require a completed order and cannot exceed its total')
+    for row in data.get('return_items', []):
+        if row.get('restock') and row.get('condition') != 'saleable':
+            error('return_items', row.get('return_id'), 'restock_condition', 'Damaged merchandise cannot be restocked')
+        header = returns.get((row.get('return_id'),), {})
+        line = sale_lines.get((header.get('order_id'), row.get('order_line_no')))
+        if line and line['quantity'] > 0 and row.get('is_active') and header.get('is_active') and header.get('status') == 'accepted':
+            value = row['returned_qty'] * (line['unit_price'] + (line['tax'] - line['discount']) / line['quantity'])
+            rid = row.get('return_id')
+            refund_limits[rid] = refund_limits.get(rid, 0) + value
+    for row in data.get('refunds', []):
+        if row.get('is_active') and row.get('refund_status') == 'settled':
+            rid = row.get('return_id')
+            order = returns.get((rid,), {}).get('order_id')
+            refunded[rid] = refunded.get(rid, 0) + row['amount']
+            order_refunds[order] = order_refunds.get(order, 0) + row['amount']
+    from decimal import Decimal, ROUND_HALF_UP
+    for rid, amount in refunded.items():
+        limit = Decimal(refund_limits.get(rid, 0)).quantize(Decimal('.01'), rounding=ROUND_HALF_UP)
+        if amount > limit:
+            error('refunds', rid, 'refund_limit', 'Settled refunds exceed accepted returned value')
+    for order, amount in order_refunds.items():
+        if amount > paid.get(order, 0):
+            error('refunds', order, 'refund_payment_limit', 'Settled refunds exceed settled payments')
     return errors

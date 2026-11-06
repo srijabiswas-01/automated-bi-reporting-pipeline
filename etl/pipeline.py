@@ -1,5 +1,5 @@
 import argparse
-from datetime import date, datetime, time, timezone
+from datetime import date, datetime, timezone
 import hashlib
 import logging
 import uuid
@@ -18,18 +18,11 @@ def lock_key(period_key):
     return int.from_bytes(hashlib.sha256(period_key.encode()).digest()[:8], 'big', signed=True)
 
 
-def backup_due(period, hour, now=None):
-    now = now or datetime.now(timezone.utc)
-    return now >= datetime.combine(period, time(hour=hour), tzinfo=timezone.utc)
-
-
 def run(settings, period, orchestrator='manual', force=False):
-    if orchestrator not in ('manual', 'github', 'airflow'):
+    if orchestrator not in ('manual', 'github'):
         raise ValueError('Invalid orchestrator')
     period_key = 'sales_daily_' + period.isoformat()
-    if orchestrator == 'airflow' and not backup_due(period, settings.deadline_hour_utc):
-        return {'status': 'skipped', 'reason': 'before deadline'}
-    engine = create_engine(settings.database_url, pool_pre_ping=True, future=True)
+    engine = create_engine(settings.database_url, pool_pre_ping=True, future=True, isolation_level='SERIALIZABLE')
     run_id = str(uuid.uuid4())
     errors = []
     try:
@@ -87,7 +80,7 @@ def run(settings, period, orchestrator='manual', force=False):
 def main():
     parser = argparse.ArgumentParser(description='Synchronize retail sources to PostgreSQL')
     parser.add_argument('--period', type=date.fromisoformat, default=datetime.now(timezone.utc).date())
-    parser.add_argument('--orchestrator', choices=['manual', 'github', 'airflow'], default='manual')
+    parser.add_argument('--orchestrator', choices=['manual', 'github'], default='manual')
     parser.add_argument('--force', action='store_true', help='Recheck a previously successful period using versioned upserts')
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO)

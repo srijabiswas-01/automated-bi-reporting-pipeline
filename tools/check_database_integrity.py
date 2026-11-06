@@ -1,10 +1,13 @@
 ﻿"""Read-only audit of live retail data; outputs aggregate findings only."""
 import json
+import hashlib
 from collections import Counter
 from sqlalchemy import create_engine, text
 from etl.config import Settings
 from etl.validate import validate
 from database.model import TABLES, DISPLAY_CODES
+from etl.extract import SOURCE_TABLES
+from etl.validate import primary_key
 
 
 def main():
@@ -23,7 +26,12 @@ def main():
             findings = Counter((e['source_table'], e['rule']) for e in errors)
             codes = {table: {'rows':len(data[table]), 'missing_codes':sum(not r.get(field) for r in data[table])} for table,(field,_,_) in DISPLAY_CODES.items()}
             chronology = sum(r['updated_at'] < r['created_at'] for rows in data.values() for r in rows)
-            print(json.dumps({'table_counts': {k:len(v) for k,v in data.items()}, 'validation_errors': len(errors), 'findings': [{'table':t,'rule':r,'count':n} for (t,r),n in findings.items()], 'codes':codes, 'metadata_chronology_errors':chronology, 'constraints':[dict(r) for r in constraints], 'triggers':[dict(r) for r in triggers], 'recent_runs':latest}, default=str, indent=2))
+            business = {t:sorted(data[t],key=lambda r:tuple(str(r[k]) for k in primary_key(t))) for t in SOURCE_TABLES}
+            fingerprint=hashlib.sha256(json.dumps(business,sort_keys=True,default=str).encode()).hexdigest()
+            report={'table_counts': {k:len(v) for k,v in data.items()}, 'business_fingerprint':fingerprint, 'validation_errors': len(errors), 'findings': [{'table':t,'rule':r,'count':n} for (t,r),n in findings.items()], 'codes':codes, 'metadata_chronology_errors':chronology, 'constraints':[dict(r) for r in constraints], 'triggers':[dict(r) for r in triggers], 'recent_runs':latest}
+            print(json.dumps(report, default=str, indent=2))
+            if errors or chronology or any(c['missing_codes'] for c in codes.values()):
+                raise SystemExit(1)
     finally:
         engine.dispose()
 

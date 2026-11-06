@@ -3,6 +3,7 @@ const source=JSON.parse(fs.readFileSync(0,'utf8'));
 let email='admin@example.invalid',failSheet='';
 class Sheet {
   constructor(name){this.name=name;this.values=[];}
+  getName(){return this.name;}
   getLastRow(){return this.values.length;}
   getDataRange(){return this.getRange(1,1,Math.max(this.values.length,1),Math.max(...this.values.map(r=>r.length),1));}
   appendRow(row){this.values.push(row);return this;}
@@ -21,7 +22,7 @@ let backupCount=0;
 const book={getSheetByName:n=>sheets[n] || null,insertSheet:n=>sheets[n]=new Sheet(n),copy:()=>{backupCount++;return {getId:()=>'synthetic-backup-id'};}};
 const initialProperties={};
 const context=vm.createContext({console,Date,Math,JSON,Number,String,Object,Array,Set,Error,
-  Utilities:{getUuid:()=>crypto.randomUUID()},
+  Utilities:{getUuid:()=>crypto.randomUUID(),formatDate:(value,zone)=>{assert.strictEqual(zone,'Asia/Kolkata');return new Date(value.getTime()+19800000).toISOString().slice(0,10);}},
   Session:{getActiveUser:()=>({getEmail:()=>email})},
   PropertiesService:{getScriptProperties:()=>({getProperty:key=>key==='SPREADSHEET_ID'?'test':key==='BOOTSTRAP_ADMIN_EMAIL'?email:initialProperties[key] || null,setProperty:(key,value)=>initialProperties[key]=value})},
   LockService:{getScriptLock:()=>({waitLock(){},releaseLock(){}})},
@@ -46,6 +47,12 @@ assert.strictEqual(snapshot().customers[0].customer_id,'CUS-001','Migration repl
 assert.strictEqual(snapshot().customers[0].customer_code,'CUS-0001');
 assert.strictEqual(snapshot().products[0].product_id,'PRD-001','Migration replaced an internal product key');
 assert.strictEqual(snapshot().products[0].product_code,'PRD-0001');
+// Sheets Date cells must retain India's date instead of becoming a UTC date.
+const dateColumn=sheets.purchase_orders.values[0].indexOf('order_date');
+const oldDate=sheets.purchase_orders.values[1][dateColumn];
+sheets.purchase_orders.values[1][dateColumn]=new Date('2026-09-01T18:30:00Z');
+assert.strictEqual(snapshot().purchase_orders[0].order_date,'2026-09-02');
+sheets.purchase_orders.values[1][dateColumn]=oldDate;
 const migratedVersion=snapshot().customers[0].version;
 assert.strictEqual(migratedVersion,Number(source.customers[0].version)+1);
 assert.strictEqual(snapshot().customers[0].version,migratedVersion,'Rereading repeatedly changed the version');
@@ -55,6 +62,36 @@ assert.strictEqual(createdCustomer.code,'CUS-0002','Client supplied a code or th
 const extra=snapshot().customers.find(r=>r.customer_id===createdCustomer.id);
 request('saveMaster',{table:'customers',record:{...extra,full_name:'Synthetic edited customer',customer_code:'CUS-9999'},version:extra.version});
 assert.strictEqual(snapshot().customers.find(r=>r.customer_id===createdCustomer.id).customer_code,'CUS-0002','An edit replaced the permanent code');
+// Rejected snapshots must not reach the durable journal or change source data.
+for (const mutate of [
+  d=>d.purchase_order_items[0].unit_cost=1.001,
+  d=>d.purchase_order_items[0].ordered_qty=2147483648,
+  d=>d.purchase_orders[0].order_date='2026-02-30',
+  d=>d.sales_order_items[0].discount=-1,
+  d=>d.goods_receipt_items[0].accepted_qty=999,
+  d=>d.inventory_balances[0].quantity_on_hand++,
+  d=>d.return_items[0].order_line_no=999,
+  d=>d.goods_receipt_items[0].received_qty=999,
+  d=>d.inventory_movements[0].quantity_change=0,
+  d=>d.payments[0].amount=99999,
+  d=>d.refunds[0].amount=99999,
+  d=>{d.return_items[0].condition='damaged';d.return_items[0].restock=true;},
+]) {
+  const candidate=snapshot(); mutate(candidate);
+  assert.throws(()=>context.validateSnapshot_(candidate));
+}
+const totals=snapshot(), originalKpis=context.dashboard_(totals);
+totals.sales_orders[0].is_active=false;
+assert.strictEqual(context.dashboard_(totals).net_sales,0,'Inactive orders remained in portal KPIs');
+assert.strictEqual(context.dashboard_(totals).orders,0);
+assert.strictEqual(originalKpis.net_sales,270);
+// Draft receipt quantities must not close a purchase prematurely.
+const receiptScenario=snapshot();
+const draftPo=context.purchase_(receiptScenario,{supplier_id:'SUP-001',store_id:'STR-001',items:[{product_id:'PRD-001',quantity:5,unit_cost:200}]}).id;
+receiptScenario.goods_receipts.push(context.stamp_({receipt_id:'draft-receipt',po_id:draftPo,received_date:new Date().toISOString(),status:'draft'}));
+receiptScenario.goods_receipt_items.push(context.stamp_({receipt_id:'draft-receipt',line_no:1,po_line_no:1,received_qty:3,accepted_qty:0}));
+context.receive_(receiptScenario,{po_id:draftPo,items:[{po_line_no:1,received_qty:2,accepted_qty:2}]});
+assert.strictEqual(receiptScenario.purchase_orders.find(p=>p.po_id===draftPo).status,'partial','Draft receipt incorrectly completed purchase');
 const product=snapshot().products[0];
 assert.throws(()=>request('saveMaster',{table:'products',record:{...product,product_id:'',sku:'PAPER-A4'}}),/Duplicate/);
 request('saveMaster',{table:'products',record:{...product,selling_price:350},version:product.version});

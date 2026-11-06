@@ -13,8 +13,8 @@ def convert(value, kind):
         return str(value).strip()
     if kind == 'integer':
         number = Decimal(str(value))
-        if not number.is_finite() or number != number.to_integral_value():
-            raise ValueError('Expected finite integer')
+        if not number.is_finite() or number != number.to_integral_value() or not -2147483648 <= number <= 2147483647:
+            raise ValueError('Expected PostgreSQL 32-bit integer')
         return int(number)
     if kind.startswith('numeric'):
         number = Decimal(str(value))

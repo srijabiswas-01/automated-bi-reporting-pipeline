@@ -61,6 +61,8 @@ function publishSuperstoreSnapshot_(scheduled) {
       const user=data.users.find(u=>String(u.email).toLowerCase()===owner && u.account_status==='active' && active_(u));
       if (!user || !data.roles.some(r=>r.role_id===user.role_id && r.role_name==='administrator' && active_(r))) throw new Error('Scheduled export owner is no longer an administrator');
     } else if (authorize_(data).role!=='administrator') throw new Error('Administrator required');
+    // Never replace the last valid cloud snapshot with inconsistent sheet edits.
+    validateSnapshot_(data);
     const config=githubSyncConfig_();
     const repository=githubSyncRequest_(config,'get','');
     if (repository.private!==true) throw new Error('Automatic export requires a PRIVATE GitHub repository');

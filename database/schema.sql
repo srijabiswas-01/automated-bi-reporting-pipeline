@@ -352,7 +352,7 @@ CREATE TABLE audit_logs (
 CREATE TABLE pipeline_runs (
     run_id text PRIMARY KEY,
     period_key text NOT NULL,
-    orchestrator text NOT NULL CHECK (orchestrator IN ('github','airflow','manual')),
+    orchestrator text NOT NULL CHECK (orchestrator IN ('github','manual')),
     status text NOT NULL CHECK (status IN ('running','succeeded','failed')),
     started_at timestamptz NOT NULL,
     heartbeat_at timestamptz NOT NULL,

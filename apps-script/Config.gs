@@ -1386,7 +1386,7 @@ const MODEL = {
     {
       "name": "orchestrator",
       "type": "text",
-      "rules": "NOT NULL CHECK (orchestrator IN ('github','airflow','manual'))"
+      "rules": "NOT NULL CHECK (orchestrator IN ('github','manual'))"
     },
     {
       "name": "status",

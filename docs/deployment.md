@@ -72,24 +72,12 @@ The service account needs no portal user record because it reads through the She
 
 Push this project to your own private GitHub repository. Configure the Actions secret DATABASE_URL using a direct, TLS-enabled Neon connection and optionally ALERT_WEBHOOK_URL. Run initialize_neon.yml once on the empty database. Configure GitHubSync.gs to export operational/snapshot.json.gz from Apps Script. primary_etl.yml runs on snapshot pushes and hourly at minute 17, with three bounded attempts. Every run rechecks newer source versions using --force, so a second update in the same day is not skipped. Manual dispatch accepts a reporting date. Secrets are passed through environment variables; manual date input is passed as a quoted shell argument. The reporting database is separate from CI's ephemeral PostgreSQL service. See automatic_neon_github.md for the complete setup.
 
-ci_tests.yml uses a disposable PostgreSQL 16 service for schema, views, fixture, constraints, duplicate-load and advisory-lock checks. Do not run test_postgres_integration.py against operational data: it assumes the single synthetic fixture and manipulates test reporting periods. The regular suite skips it unless DATABASE_URL is explicitly exported.
+ci_tests.yml uses a disposable PostgreSQL 16 service for schema, views, fixture, constraints, duplicate-load and advisory-lock checks. Do not run test_postgres_integration.py against operational data: it assumes the single synthetic fixture and manipulates test reporting periods. The regular suite skips it unless TEST_DATABASE_URL is explicitly exported.
 
-## 6. Independent Airflow backup
-
-The supplied Dockerfile targets Airflow 2.10.5 with its compatible SQLAlchemy 1.4 dependency and psycopg2 driver; the main application uses SQLAlchemy 2.0 and psycopg3. Supply a plain postgresql:// URL so Settings selects the installed driver's dialect. The shared ETL uses APIs compatible with both. Airflow is deliberately not tied to the primary GitHub runner.
-
-```powershell
-docker build -f airflow/Dockerfile -t superstore-airflow .
-```
-
-Deploy that image on an independently available Airflow 2.10 host with its own metadata database, scheduler and webserver, or use an equivalent managed deployment. Supply the same ETL secrets and a shared PostgreSQL DATABASE_URL. Configure Airflow authentication, secret storage, logs and health monitoring through that host. The image includes the DAG and shared ETL but does not provision the host or Airflow metadata database automatically.
-
-The DAG checks at :15 and :45 during 03:00–06:59 UTC and recovers the most recent seven periods. Before the 03:00 UTC (08:30 IST) deadline it skips the current period. A global session advisory lock prevents competing writers even across different backfill dates; workers that cannot acquire it skip. After acquiring the lock, the next worker marks abandoned running records failed before claiming a replacement. A successful period skips unless manually forced. Heartbeats record the start and finish; lock ownership, not a heartbeat timeout, decides whether recovery is safe. Backfills synchronize the current snapshot under the specified period key; they do not reconstruct historical source snapshots.
-
-## 7. Publish the dashboard
+## 6. Publish the dashboard
 
 Deploy dashboard/app.py on a Streamlit-capable host with requirements.txt, set DASHBOARD_DEMO=false and provide a read-only PostgreSQL DATABASE_URL. Protect the dashboard with the hosting provider's access controls; it contains customer data and has no standalone login implementation. The UI catches connection failures without displaying database credentials. Refresh clears the 60-second data cache.
 
-Before operational use, run cloud identity, permission, interrupted-write and failover checks in your own environments. No script IDs, service accounts, cloud resources, public URLs or real credentials are included in this repository.
+Before operational use, run cloud identity, permission, interrupted-write and retry checks in your own environments. No script IDs, service accounts, cloud resources, public URLs or real credentials are included in this repository.
 
-Official API references: [Apps Script client/server calls](https://developers.google.com/apps-script/guides/html/communication), [Session identity availability](https://developers.google.com/apps-script/reference/base/session), [SQLAlchemy PostgreSQL upserts](https://docs.sqlalchemy.org/en/20/dialects/postgresql.html), [Airflow PythonOperator](https://airflow.apache.org/docs/apache-airflow/2.10.4/howto/operator/python.html).
+Official API references: [Apps Script client/server calls](https://developers.google.com/apps-script/guides/html/communication), [Session identity availability](https://developers.google.com/apps-script/reference/base/session), [SQLAlchemy PostgreSQL upserts](https://docs.sqlalchemy.org/en/20/dialects/postgresql.html).

@@ -27,6 +27,7 @@ class LoadDiagnosticTests(unittest.TestCase):
                 result.fetchall.return_value=returned
                 connection=MagicMock()
                 connection.execute.side_effect=[MagicMock(),result,MagicMock()]
-                with patch('etl.load.Table',return_value=table):
+                with patch('etl.load.MetaData') as metadata:
+                    metadata.return_value.tables={'categories':table}
                     self.assertEqual(load(connection,{'categories':rows}),expected)
                 self.assertTrue(connection.execute.call_args_list[1].args[0]._returning)

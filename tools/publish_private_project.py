@@ -11,9 +11,30 @@ import subprocess
 import tempfile
 
 ROOT=Path(__file__).resolve().parents[1]
-FOLDERS=('.github','apps-script','database','etl','airflow','dashboard','docs','sample_data','tests','tools','operational')
+FOLDERS=('.github','apps-script','database','etl','dashboard','docs','sample_data','tests','tools','operational')
 ROOT_FILES=('README.md','requirements.txt','docker-compose.yml','.env.example','.gitignore','.clasp.json','.claspignore')
 SUFFIXES={'.py','.sql','.gs','.html','.json','.md','.yml','.yaml','.txt','.csv','.cjs'}
+
+
+def complete_source_files():
+    """Include source and known synthetic CI fixtures, never live exports."""
+    files=[ROOT/name for name in ROOT_FILES if name!='.clasp.json' and (ROOT/name).is_file()]
+    files.append(ROOT/'.streamlit/config.toml')
+    for name in ('.github','apps-script','database','etl','dashboard','docs','tests','tools'):
+        files.extend(p for p in (ROOT/name).rglob('*') if p.is_file()
+                     and p.suffix in SUFFIXES
+                     and not any(part in ('__pycache__','.venv','.git','node_modules','logs') for part in p.relative_to(ROOT).parts)
+                     and not p.name.startswith(('credentials','service-account','.env.')))
+    manifest=json.loads((ROOT/'database/sheets_manifest.json').read_text(encoding='utf-8'))
+    for table in manifest:
+        files.append(ROOT/'sample_data/sheets'/f'{table}.csv')
+        if table not in ('pipeline_runs','quality_errors','etl_watermarks'):
+            files.append(ROOT/'sample_data'/f'{table}.csv')
+    files.append(ROOT/'sample_data/seed.sql')
+    missing=[p.relative_to(ROOT).as_posix() for p in files if not p.is_file()]
+    if missing:
+        raise SystemExit('Missing project files: '+', '.join(missing))
+    return sorted(set(files))
 
 
 def command(args,cwd=None):
@@ -29,7 +50,15 @@ def main():
     modes=parser.add_mutually_exclusive_group()
     modes.add_argument('--initialize-only',action='store_true',help='Upload only schema initialization code; no data, samples or portal files')
     modes.add_argument('--pipeline-only',action='store_true',help='Upload only ETL source and its automatic workflow; no data or credentials')
+    modes.add_argument('--complete-source',action='store_true',help='Upload all project source and synthetic CI fixtures; exclude live exports and credentials')
+    parser.add_argument('--dry-run',action='store_true',help='List the complete-source upload without accessing GitHub')
     args=parser.parse_args()
+    if args.dry_run:
+        if not args.complete_source:
+            parser.error('--dry-run requires --complete-source')
+        for path in complete_source_files():
+            print(path.relative_to(ROOT).as_posix())
+        return
     gh=shutil.which('gh')
     if not gh:
         raise SystemExit('GitHub CLI is required')
@@ -47,7 +76,7 @@ def main():
         files=[ROOT/name for name in ('.github/workflows/primary_etl.yml','requirements.txt','database/model.py','database/schema.sql','database/sheets_manifest.json',
             'etl/__init__.py','etl/config.py','etl/extract.py','etl/transform.py','etl/validate.py',
             'etl/load.py','etl/pipeline.py','etl/monitoring.py','etl/schema.py')]
-    for name in (() if args.initialize_only or args.pipeline_only else FOLDERS):
+    for name in (() if args.initialize_only or args.pipeline_only or args.complete_source else FOLDERS):
         folder=ROOT/name
         if not folder.exists():
             continue
@@ -55,6 +84,8 @@ def main():
                      and not any(part in ('__pycache__','.venv','.git','node_modules','logs') for part in p.relative_to(ROOT).parts)
                      and (p.suffix in SUFFIXES or p.name=='Dockerfile')
                      and not p.name.startswith(('credentials','service-account','.env.')))
+    if args.complete_source:
+        files=complete_source_files()
     auth=['git','-c','credential.helper=','-c','credential.helper=!gh auth git-credential']
     with tempfile.TemporaryDirectory(prefix='superstore-private-publish-') as directory:
         checkout=Path(directory)/'repository'
@@ -74,6 +105,8 @@ def main():
             message='Add empty Neon database initialization workflow' if args.initialize_only else 'Add retail portal and automatic Sheets-to-Neon reporting'
             if args.pipeline_only:
                 message='Add automatic snapshot ETL workflow for Neon'
+            if args.complete_source:
+                message='Complete project source and synthetic CI fixtures'
             command(['git','-c',f'user.name={author_name}','-c',f'user.email={author_email}',
                      'commit','-m',message],cwd=checkout)
             command(auth+['push','origin','HEAD'],cwd=checkout)

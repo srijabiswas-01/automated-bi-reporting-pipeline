@@ -51,8 +51,8 @@ jobs:
           psql -v ON_ERROR_STOP=1 -f database/reporting_views.sql
           psql -v ON_ERROR_STOP=1 -f sample_data/seed.sql
           psql -v ON_ERROR_STOP=1 -f tests/verify_database.sql
-      - name: Exercise versioned loading and failover against PostgreSQL
+      - name: Exercise versioned loading and concurrency against PostgreSQL
         env:
-          DATABASE_URL: postgresql+psycopg://superstore:ci-test-only@localhost:5432/superstore
+          TEST_DATABASE_URL: postgresql+psycopg://superstore:ci-test-only@localhost:5432/superstore
           ETL_SOURCE: csv
         run: python -m unittest discover -s tests -p test_postgres_integration.py -v

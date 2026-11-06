@@ -1,6 +1,6 @@
 import logging
 import re
-from sqlalchemy import MetaData, Table, text
+from sqlalchemy import MetaData, text
 from sqlalchemy.dialects.postgresql import insert
 from etl.validate import primary_key
 
@@ -29,10 +29,13 @@ def load(connection, data):
     # Preserve source-managed metadata when updating the analytical replica.
     connection.execute(text("SELECT set_config('superstore.preserve_metadata', 'on', true)"))
     metadata = MetaData()
+    # SQLAlchemy batches catalog queries for the whole schema. Reflecting one
+    # Table at a time caused hundreds of network round trips on each cloud load.
+    metadata.reflect(bind=connection, only=list(data), resolve_fks=False)
     count = 0
     for name, rows in data.items():
         try:
-            table = Table(name, metadata, autoload_with=connection)
+            table = metadata.tables[name]
             keys = primary_key(name)
             for start in range(0,len(rows),100):
                 batch=rows[start:start+100]
@@ -47,7 +50,9 @@ def load(connection, data):
                 latest = max(rows, key=lambda row: (row['updated_at'], str(tuple(row[k] for k in keys))))
                 connection.execute(text('''INSERT INTO etl_watermarks(source_table,last_updated_at,last_source_key)
                     VALUES (:table,:timestamp,:key) ON CONFLICT(source_table) DO UPDATE
-                    SET last_updated_at=EXCLUDED.last_updated_at,last_source_key=EXCLUDED.last_source_key'''),
+                    SET last_updated_at=EXCLUDED.last_updated_at,last_source_key=EXCLUDED.last_source_key
+                    WHERE (EXCLUDED.last_updated_at,EXCLUDED.last_source_key) >
+                          (etl_watermarks.last_updated_at,etl_watermarks.last_source_key)'''),
                     dict(table=name, timestamp=latest['updated_at'], key=str(tuple(latest[k] for k in keys))))
             LOGGER.info('Prepared table %s (%d source rows)',name,len(rows))
         except Exception as exc:
