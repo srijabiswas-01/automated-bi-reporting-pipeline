@@ -20,7 +20,7 @@ from etl.config import ROOT
 @unittest.skipUnless(os.getenv('TEST_DATABASE_URL'), 'Set TEST_DATABASE_URL for initialized disposable PostgreSQL integration checks')
 class PostgreSQLIntegrationTests(unittest.TestCase):
     def test_load_skip_retry_and_lock(self):
-        settings=replace(Settings.from_env(), database_url=os.environ['TEST_DATABASE_URL'], source='csv')
+        settings=Settings(database_url=os.environ['TEST_DATABASE_URL'], source='csv')
         period=date(2099,1,2)
         engine=create_engine(settings.database_url)
         try:
@@ -47,7 +47,7 @@ class PostgreSQLIntegrationTests(unittest.TestCase):
             engine.dispose()
 
     def test_z_apps_script_export_to_database_and_integrity(self):
-        settings=replace(Settings.from_env(), database_url=os.environ['TEST_DATABASE_URL'], source='snapshot')
+        settings=Settings(database_url=os.environ['TEST_DATABASE_URL'], source='snapshot')
         source, errors=transform(extract_csv(ROOT/'sample_data'))
         self.assertEqual(errors, [])
         result=subprocess.run(['node','tests/apps_script_test.cjs'], cwd=ROOT,

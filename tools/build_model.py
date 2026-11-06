@@ -25,7 +25,7 @@ def build():
         dictionary += [f'| {key} | {kind} | {rule or "Optional"} |' for key, kind, rule in columns]
         dictionary.append('')
         with (ROOT / 'sample_data/sheets' / f'{name}.csv').open('w', newline='', encoding='utf-8') as handle:
-            csv.writer(handle).writerow([f[0] for f in columns])
+            csv.writer(handle, lineterminator='\n').writerow([f[0] for f in columns])
         manifest[name] = [{'name': key, 'type': kind, 'rules': rule} for key, kind, rule in columns]
     sql += ["""CREATE FUNCTION touch_record() RETURNS trigger LANGUAGE plpgsql AS $$
 BEGIN

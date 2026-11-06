@@ -1,9 +1,12 @@
 import os
 import unittest
 from unittest.mock import patch
+from pathlib import Path
 from streamlit.testing.v1 import AppTest
 from dashboard.common import demo_mode, display_records
 import pandas as pd
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 class DashboardTests(unittest.TestCase):
@@ -31,7 +34,7 @@ class DashboardTests(unittest.TestCase):
 
     def test_overview_and_all_reporting_pages_render(self):
         with patch.dict(os.environ,{'DASHBOARD_DEMO':'true'}):
-            overview=AppTest.from_file('dashboard/app.py',default_timeout=30).run()
+            overview=AppTest.from_file(str(ROOT / 'dashboard/app.py'),default_timeout=30).run()
             self.assertEqual(list(overview.exception),[])
             self.assertEqual(overview.metric[0].value,'₹270.00')
             for page in ('sales','products','customers','inventory','pipeline_monitor'):

@@ -23,7 +23,7 @@ def build():
     for table in SOURCE_TABLES:
         columns = TABLES[table] + METADATA
         with (ROOT / 'sample_data' / f'{table}.csv').open('w', encoding='utf-8', newline='') as handle:
-            writer = csv.writer(handle)
+            writer = csv.writer(handle, lineterminator='\n')
             writer.writerow([n for n, _, _ in columns])
             for row in connection.execute(f'SELECT * FROM {table}'):
                 values = []
