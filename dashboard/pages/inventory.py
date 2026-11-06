@@ -1,6 +1,6 @@
 import pandas as pd
 import streamlit as st
-from dashboard.common import context, bar, download
+from dashboard.common import context, bar, download, display_records
 
 
 def render():
@@ -22,10 +22,13 @@ def render():
     cols[0].metric('Current stock value',f'₹{balances.current_stock_value.sum():,.2f}')
     cols[1].metric('Stockout lines',int(balances.available_quantity.eq(0).sum()))
     cols[2].metric('Reorder alerts',int(balances.needs_reorder.sum()))
-    store=st.selectbox('Inventory store',['All']+list(balances.store_id.unique()))
+    store_labels = data['stores'].set_index('store_id').store_name.to_dict()
+    store=st.selectbox('Inventory store',['All']+list(balances.store_id.unique()),
+                       format_func=lambda value: 'All' if value == 'All' else store_labels.get(value, 'Store'))
     if store!='All':
         balances=balances[balances.store_id.eq(store)]
     bar(balances,'product_name','available_quantity','Available stock')
-    st.dataframe(balances.sort_values('available_quantity'),hide_index=True)
+    visible = display_records(balances.sort_values('available_quantity'), data)
+    st.dataframe(visible,hide_index=True)
     st.caption('Current-cost valuation. Turnover and inventory ageing require historical valuation and lot snapshots and are not inferred from the current balance.')
-    download(balances,'inventory.csv')
+    download(visible,'inventory.csv')

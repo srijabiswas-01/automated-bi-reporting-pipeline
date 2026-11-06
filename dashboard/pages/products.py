@@ -1,10 +1,10 @@
 import streamlit as st
-from dashboard.common import context, bar, download
+from dashboard.common import context, bar, download, display_records
 
 
 def render():
     st.title('Product profitability')
-    _, lines = context()
+    data, lines = context()
     if lines.empty:
         st.info('No sales match the selected filters.')
         return
@@ -12,5 +12,6 @@ def render():
     grouped['gross_margin_pct'] = grouped.gross_profit.div(grouped.net_sales.where(grouped.net_sales.ne(0))).mul(100)
     bar(grouped.sort_values('gross_profit',ascending=False).head(10),'product_name','gross_profit','Top products by profit')
     st.subheader('Product mix and margin')
-    st.dataframe(grouped.sort_values('gross_margin_pct'),hide_index=True)
-    download(grouped,'product_profitability.csv')
+    visible = display_records(grouped.sort_values('gross_margin_pct'), data)
+    st.dataframe(visible,hide_index=True)
+    download(visible,'product_profitability.csv')

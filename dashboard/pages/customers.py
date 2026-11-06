@@ -1,5 +1,5 @@
 import streamlit as st
-from dashboard.common import context, bar, download
+from dashboard.common import context, bar, download, display_records
 
 
 def render():
@@ -13,5 +13,6 @@ def render():
     st.metric('Repeat purchase rate in selected period',f'{grouped.completed_orders.gt(1).mean()*100:.1f}%')
     segments=grouped.merge(data['segments'][['segment_id','segment_name']],on='segment_id',how='left').fillna({'segment_name':'Unassigned'})
     bar(segments.groupby('segment_name',as_index=False).period_net_sales.sum(),'segment_name','period_net_sales','Customer segments')
-    st.dataframe(grouped.sort_values('period_net_sales',ascending=False),hide_index=True)
-    download(grouped,'customer_intelligence.csv')
+    visible = display_records(segments.sort_values('period_net_sales',ascending=False), data)
+    st.dataframe(visible,hide_index=True)
+    download(visible,'customer_intelligence.csv')

@@ -2,10 +2,25 @@ import os
 import unittest
 from unittest.mock import patch
 from streamlit.testing.v1 import AppTest
-from dashboard.common import demo_mode
+from dashboard.common import demo_mode, display_records
+import pandas as pd
 
 
 class DashboardTests(unittest.TestCase):
+    def test_display_codes_replace_ids_without_changing_source_or_totals(self):
+        source = pd.DataFrame({'customer_id':['internal-uuid'], 'segment_id':['segment-uuid'], 'period_net_sales':[123.45]})
+        data = {
+            'customers': pd.DataFrame({'customer_id':['internal-uuid'], 'customer_code':['CUS-0001']}),
+            'segments': pd.DataFrame({'segment_id':['segment-uuid'], 'segment_code':['SEG-0001']}),
+        }
+        visible = display_records(source, data)
+        self.assertEqual(visible.customer_code.tolist(), ['CUS-0001'])
+        self.assertEqual(visible.segment_code.tolist(), ['SEG-0001'])
+        self.assertFalse(any(column.endswith('_id') for column in visible))
+        self.assertEqual(visible.period_net_sales.sum(), source.period_net_sales.sum())
+        self.assertEqual(source.customer_id.tolist(), ['internal-uuid'])
+        self.assertNotIn('internal-uuid', visible.to_csv(index=False))
+
     def test_database_mode_is_read_from_env_file_before_database_access(self):
         with patch.dict(os.environ,{},clear=True), patch('dashboard.common.dotenv_values',return_value={'DASHBOARD_DEMO':'false'}):
             self.assertFalse(demo_mode())

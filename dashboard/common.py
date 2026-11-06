@@ -124,3 +124,25 @@ def bar(frame, x, y, title):
 
 def download(frame, filename):
     st.download_button('Download CSV', frame.to_csv(index=False).encode(), filename, 'text/csv')
+
+
+def display_records(frame, data):
+    """Resolve business references to permanent codes without changing join keys."""
+    from database.model import DISPLAY_CODES
+    result = frame.copy()
+    for table, (code, _, _) in DISPLAY_CODES.items():
+        master = data.get(table)
+        if master is None or master.empty:
+            continue
+        from database.model import TABLES
+        key = TABLES[table][0][0]
+        if key not in result or key not in master:
+            continue
+        mapping = master.set_index(key)[code] if code in master else pd.Series(dtype=str)
+        values = result[key].map(mapping).replace('', pd.NA).fillna('Code pending sync')
+        if code in result:
+            result[code] = result[code].replace('', pd.NA).fillna(values)
+        else:
+            result.insert(result.columns.get_loc(key), code, values)
+    # UUIDs and technical references are retained only in the calculation frames.
+    return result.drop(columns=[c for c in result if c.endswith('_id') or c.endswith('_id_order')])

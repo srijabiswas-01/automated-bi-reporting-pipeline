@@ -1,5 +1,5 @@
 import streamlit as st
-from dashboard.common import context, kpis, bar, download
+from dashboard.common import context, kpis, bar, download, display_records
 
 
 def render():
@@ -18,5 +18,6 @@ def render():
         previous, current = monthly.net_sales.iloc[-2:]
         st.metric('Latest month growth',f'{(current-previous)/previous*100:.2f}%' if previous else '—')
         st.caption('Calendar-month totals; the latest month may be incomplete.')
-    st.dataframe(lines,hide_index=True)
-    download(lines,'sales_lines.csv')
+    visible = display_records(lines, data)
+    st.dataframe(visible,hide_index=True)
+    download(visible,'sales_lines.csv')
